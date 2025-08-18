@@ -1,0 +1,21 @@
+{
+  "name": "testing-ui-rbiu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "headed": "npx playwright test --headed",
+    "debug": "npx playwright test --debug",
+    "test": "npx playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^24.2.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1"
+  }
+}

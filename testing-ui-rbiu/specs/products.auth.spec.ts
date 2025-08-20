@@ -1,0 +1,53 @@
+import { test, expect } from "@playwright/test";
+import { ProductsPage } from "../pages/products-page";
+import { CreateProductPage, ProductData } from "../pages/create-product-page";
+import path from "path";
+
+test.describe("Pagina de Productos", () => {
+  let productsPage: ProductsPage;
+  let createProductPage: CreateProductPage;
+
+  test.beforeEach(async ({ page }) => {
+    productsPage = new ProductsPage(page);
+    createProductPage = new CreateProductPage(page);
+    await productsPage.goto();
+  });
+
+  test("Buscar un producto existente", async () => {
+    const productData: ProductData = {
+      name: `Producto de Prueba ggg ${Date.now()}`,
+      price: "100000",
+      quantity: "5",
+      description: "Aviones de combate utilizados en misiones de prueba.",
+      imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
+      visible: "Sí",
+      reservable: "No",
+      deliveryDetails:
+        "Las entregas de realizan desde las 08:00 hasta las 15:00 de lunes a viernes",
+      expirationDate: { day: "1", month: "12", year: "2025" },
+    };
+ 
+    // Primero, vamos a la página de creación y creamos un producto
+    await createProductPage.goto();
+    await createProductPage.fillForm(productData);
+    await createProductPage.submit();
+    await createProductPage.verifySuccess(productData.name);
+ 
+    // Ahora vamos a la página de productos y lo buscamos
+    await productsPage.goto();
+    await productsPage.searchProduct(productData.name);
+    await productsPage.verifyProductIsVisible(productData.name);
+  });
+
+  test("Buscar un producto inexistente", async () => {
+    const productName = "ProductoInexistente12345";
+    await productsPage.searchProduct(productName);
+    await productsPage.verifyProductIsNotVisible(productName);
+  });
+
+  test("Buscar con campo de búsqueda vacío", async () => {
+    await productsPage.searchProduct("");
+    // Si se espera que la lista de productos esté visible (todos los productos):
+    await expect(productsPage.productList).toBeVisible();
+  });
+});

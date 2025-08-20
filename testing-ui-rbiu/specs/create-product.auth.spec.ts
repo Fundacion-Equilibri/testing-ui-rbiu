@@ -12,7 +12,7 @@ test("Crear un producto", async ({ page }) => {
   await createProductPage.handleCookies();
 
   // Definimos los datos del producto en un objeto para mayor claridad.
-  const productName = "Aeronave F-22 Raptor";
+  const productName = "Aeronave F-22 Raptor " + Date.now();
   const productData: ProductData = {
     name: productName,
     price: "50000",

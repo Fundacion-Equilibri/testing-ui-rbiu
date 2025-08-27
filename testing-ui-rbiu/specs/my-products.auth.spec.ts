@@ -5,7 +5,6 @@ import {
 } from "../pages/create-product-page";
 import { MyProductsPage } from "../pages/my-products-page";
 import { EditProductPage } from "../pages/edit-product-page";
-import { config } from "../config/configs";
 import path from "path";
 
 test.describe("Gestión de Mis Productos", () => {
@@ -58,7 +57,7 @@ test.describe("Gestión de Mis Productos", () => {
     await createProductPage.submit();
     await createProductPage.verifySuccess(productData.name);
 
-    // Paso 2: Ir a la lista de productos y navegar a la página de edición.
+    // Paso 2: Ir a la lista de mis productos y navegar a la página de edición.
     await myProductsPage.goto();
     await myProductsPage.editProduct(productData.name);
 

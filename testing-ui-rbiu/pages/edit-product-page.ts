@@ -11,11 +11,7 @@ export class EditProductPage {
     this.pageTitle = page
       .locator("article")
       .getByText("Modifica un producto", { exact: true });
-
-    // getByRole('link') no funciona aquí porque el elemento <a> probablemente no tiene un
-    // atributo 'href', por lo que no es un enlace semántico.
-    // En su lugar, usamos un selector de clase CSS que es más específico para este caso.
-    // El selector '.clase1.clase2' busca un elemento que tenga AMBAS clases.
+    // Localiza el boton de eliminar
     this.deleteLink = page.locator(
       ".et_pb_button.et_pb_button_eliminar_producto"
     );
@@ -27,16 +23,35 @@ export class EditProductPage {
   }
 
   async deleteProduct() {
-    await this.deleteLink.click();
+    // Manejar el banner de cookies si está presente, ya que podría bloquear clics en modo headed.
+    // Idealmente, esto debería manejarse de forma global (ej. en un hook beforeEach o una función de setup).
+    const acceptCookiesButton = this.page.locator("#cookie-law-info-bar", {
+      hasText: "Aceptar",
+    });
+    // Usamos un bloque try/catch con un timeout corto para manejar el banner de cookies
+    // de forma segura, sin que el test falle si el banner no aparece.
+    try {
+      await acceptCookiesButton.click({ timeout: 3000 });
+    } catch (error) {
+      // El banner no apareció o ya fue aceptado, lo cual es correcto. Ignoramos el error.
+      console.log(
+        "Banner de cookies no encontrado o ya gestionado, continuando con el test."
+      );
+    }
 
-    // Tienes razón, hay dos botones con el texto "Sí". Para seleccionar el correcto,
-    // la mejor estrategia es localizar primero el contenedor del modal de confirmación
-    // usando su título único, y luego buscar el botón "Sí" DENTRO de ese modal.
-    const confirmationModal = this.page.locator("div", {
+    // Nos aseguramos de que el botón esté en la vista antes de hacer clic.
+    // Esto es crucial en modo --headed si el botón está al final de la página.
+    // await this.deleteLink.scrollIntoViewIfNeeded();
+    await this.deleteLink.click({ delay: 1000, timeout: 10000 });
+
+    // Localiza el modal por su ID y espera a que sea visible.
+    const confirmationModal = this.page.locator("#confirmationPopup", {
       has: this.page.getByRole("heading", {
         name: "¿Estás seguro de que quieres eliminar el producto?",
       }),
     });
+
+    await expect(confirmationModal).toBeVisible();
     await confirmationModal.getByRole("button", { name: "Sí" }).click();
   }
 }

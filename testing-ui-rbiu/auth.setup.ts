@@ -11,7 +11,7 @@ setup("Authenticacion de usuario", async ({ page }) => {
       "Las variables de entorno EUTAXIA_USER y EUTAXIA_PASSWORD deben estar definidas."
     );
   }
-  console.log({ email, password })
+  console.log({ email, password });
   // Realiza el proceso de login
   await page.goto(`${config.URL_BASE}`);
 
@@ -25,7 +25,7 @@ setup("Authenticacion de usuario", async ({ page }) => {
   // Espera a que la página cargue después del login para asegurar que fue exitoso
   await expect(
     page.getByRole("link", { name: /Crea tus productos/i })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 30 * 1000 });
 
   // Guarda el estado de autenticación en el archivo auth.json
   await page.context().storageState({ path: authFile });

@@ -25,9 +25,9 @@ export class EditProductPage {
   async deleteProduct() {
     // Manejar el banner de cookies si está presente, ya que podría bloquear clics en modo headed.
     // Idealmente, esto debería manejarse de forma global (ej. en un hook beforeEach o una función de setup).
-    const acceptCookiesButton = this.page.locator("#cookie-law-info-bar", {
-      hasText: "Aceptar",
-    });
+    const acceptCookiesButton = this.page
+      .locator("#cookie-law-info-bar")
+      .getByRole("button", { name: "Aceptar" });
     // Usamos un bloque try/catch con un timeout corto para manejar el banner de cookies
     // de forma segura, sin que el test falle si el banner no aparece.
     try {
@@ -41,8 +41,8 @@ export class EditProductPage {
 
     // Nos aseguramos de que el botón esté en la vista antes de hacer clic.
     // Esto es crucial en modo --headed si el botón está al final de la página.
-    // await this.deleteLink.scrollIntoViewIfNeeded();
-    await this.deleteLink.click({ delay: 1000, timeout: 10000 });
+    await this.deleteLink.scrollIntoViewIfNeeded();
+    await this.deleteLink.click();
 
     // Localiza el modal por su ID y espera a que sea visible.
     const confirmationModal = this.page.locator("#confirmationPopup", {

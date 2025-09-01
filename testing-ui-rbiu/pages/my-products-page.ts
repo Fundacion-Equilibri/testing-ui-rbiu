@@ -22,7 +22,7 @@ export class MyProductsPage {
     return this.productList.locator(".elementList", { hasText: name });
   }
 
-  // MEODO QUE ELIMINA UN PRODUCTO
+  // METODO QUE NAVEGA AL PRODUCTO ESPECIFICO PARA ELIMINAR
   async editProduct(productName: string): Promise<void> {
     // De la lista de productos hacer click en el producto y navega a dicho producto
 
@@ -44,12 +44,18 @@ export class MyProductsPage {
     );
   }
 
-  //  Verifica que un producto con un nombre específico NO está visible en la lista.
+  // VERIFICA QUE UN PRODUCTO CON UN NOMBRE ESPECIFICO NO ESTE VISIBLE EN LA LISTA
   async verifyProductIsNotListed(productName: string): Promise<void> {
     // Usamos el mismo selector que en `verifyProductIsListed` pero negamos la aserción.
     const productLocator = this.productList.locator(".elementList", {
       hasText: productName,
     });
     await expect(productLocator).not.toBeVisible();
+  }
+
+  // Opción extra: Método que devuelve boolean (sin aserciones)
+  async isProductListed(name: string): Promise<boolean> {
+    const productCard = this.getProductCardByName(name);
+    return await productCard.isVisible();
   }
 }

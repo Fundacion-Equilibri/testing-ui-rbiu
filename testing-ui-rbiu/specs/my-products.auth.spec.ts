@@ -6,9 +6,11 @@ import {
 import { MyProductsPage } from "../pages/my-products-page";
 import { EditProductPage } from "../pages/edit-product-page";
 import path from "path";
+import { ProductsPage } from "../pages/products-page";
 
 test.describe("Gestión de Mis Productos", () => {
   let createProductPage: CreateProductPage;
+  let productsPage: ProductsPage;
   let myProductsPage: MyProductsPage;
   let editProductPage: EditProductPage;
   let productData: ProductData;
@@ -18,6 +20,7 @@ test.describe("Gestión de Mis Productos", () => {
   test.beforeEach(async ({ page }) => {
     // Inicializamos las páginas aquí para que estén disponibles en todos los tests del describe.
     createProductPage = new CreateProductPage(page);
+    productsPage = new ProductsPage(page);
     myProductsPage = new MyProductsPage(page);
     editProductPage = new EditProductPage(page);
 
@@ -57,8 +60,11 @@ test.describe("Gestión de Mis Productos", () => {
     await createProductPage.submit();
     await createProductPage.verifySuccess(productData.name);
 
-    // Paso 2: Ir a la lista de mis productos y navegar a la página de edición.
-    await myProductsPage.goto();
+    // Paso 2: Ir a la pagina de edicion y eliminar producto
+    await productsPage.goto();
+    await productsPage.searchProduct(productData.name); // Busca el producto
+    await productsPage.verifyProductIsVisible(productData.name); // Verifica que existe
+
     await myProductsPage.editProduct(productData.name);
 
     // Paso 3: Verificar que estamos en la página de edición y eliminar el producto.

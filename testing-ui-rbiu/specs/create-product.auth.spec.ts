@@ -65,6 +65,25 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
 
     const validationTestCases = [
       {
+        case: "cuando todos los campos están vacíos",
+        productData: {
+          ...baseProduct,
+          name: "",
+          price: "",
+          quantity: "",
+          description: "",
+          imagePath: "",
+          deliveryDetails: "",
+          expirationDate: { day: "", month: "", year: "" },
+        },
+        expectedError: [
+          "Nombre del producto: Este campo es obligatorio.",
+          "Precio (en logos): El precio no puede ser inferior a 1 λ.",
+          "Descripción: Este campo es obligatorio.",
+          "Imagen: Este campo es obligatorio.",
+        ],
+      },
+      {
         case: "cuando el nombre está vacío",
         productData: { ...baseProduct, name: "" },
         expectedError: "Nombre del producto: Este campo es obligatorio.",
@@ -92,14 +111,12 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
         const createProductPage = new CreateProductPage(page);
         await createProductPage.goto();
         await createProductPage.handleCookies();
-
-        if (tc.productData.imagePath)
-          await createProductPage.fillForm(tc.productData);
-        else await createProductPage.fillForm(tc.productData, false);
+        // Usamos un 'if' para decidir si llamamos a setInputFiles
+        await createProductPage.fillForm(tc.productData, !!tc.productData.imagePath);
 
         await createProductPage.submit();
 
-        await createProductPage.verifyErrorMessages([tc.expectedError]);
+        await createProductPage.verifyErrorMessages(tc.expectedError);
       });
     }
   });

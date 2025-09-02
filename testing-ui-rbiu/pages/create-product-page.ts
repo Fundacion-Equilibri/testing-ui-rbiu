@@ -96,11 +96,25 @@ export class CreateProductPage {
   // Verificar mensaje o mensajes de error
   async verifyErrorMessages(expectedMessages: string | string[]) {
     await expect(this.validationContainer).toBeVisible();
+
     const messages = Array.isArray(expectedMessages)
       ? expectedMessages
       : [expectedMessages];
+
+    // localizar todos los <li> dentro del contenedor de validación
+    const errorItems = this.validationContainer.locator("ol li");
+    const errorCount = await errorItems.count();
+    const actualMessages: string[] = [];
+
+    for (let i = 0; i < errorCount; i++) {
+      actualMessages.push(await errorItems.nth(i).innerText());
+    }
+
+    // Verificamos que todos los mensajes esperados estén en la lista
     for (const message of messages) {
-      await expect(this.validationContainer).toContainText(message);
+      await expect
+        .soft(actualMessages, `Error esperado no encontrado: "${message}"`)
+        .toContain(message);
     }
   }
 }

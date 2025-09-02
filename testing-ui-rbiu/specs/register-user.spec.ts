@@ -22,8 +22,6 @@ test("Navegar a la página de registro desde el modal de login", async ({
 });
 
 // --- Tests de Escenarios de Registro ---
-
-// Definimos un tipo para nuestros casos de prueba para mejorar la autocompletación y seguridad.
 interface TestCase {
   testName: string;
   data: RegistrationData;
@@ -122,54 +120,56 @@ const testCases: TestCase[] = [
     // El mensaje de error puede variar, ajústalo según tu aplicación.
     expectedMessage: "Contraseña: Tus contraseñas no concuerdan.",
   },
-  // {
-  //   testName: "Registro exitoso con datos válidos",
-  //   data: {
-  //     nombre: "Jaden",
-  //     apellidos: "White Smith",
-  //     telefonoMovil: `71${Math.floor(100000 + Math.random() * 900000)}`,
-  //     fechaNacimiento: { dia: "1", mes: "12", anio: "2000" },
-  //     nombrePublico: "JadenXR",
-  //     presentacion: "Soy un gamer muy cotizado en el mundo extraterrestre", // campo opcional
-  //     direccion: "Sucre",
-  //     email: `test.user.${Date.now()}@example.com`, // Email único para cada ejecución
-  //     password: "IpssoftSicilia2019!",
-  //     confirmPassword: "IpssoftSicilia2019!",
-  //   },
-  //   expectedOutcome: "success",
-  //   // El mensaje de éxito puede variar, ajústalo según tu aplicación.
-  //   expectedMessage:
-  //     "Un correo fue enviado a su gmail, para verificar su cuenta.",
-  // },
+  {
+    testName: "Registro exitoso con datos válidos",
+    data: {
+      nombre: "Jaden",
+      apellidos: "White Smith",
+      telefonoMovil: `71${Math.floor(100000 + Math.random() * 900000)}`,
+      fechaNacimiento: { dia: "1", mes: "12", anio: "2000" },
+      nombrePublico: "JadenXR",
+      presentacion: "Soy un gamer muy cotizado en el mundo extraterrestre", // campo opcional
+      direccion: "Sucre",
+      email: `test.user.${Date.now()}@example.com`, // Email único para cada ejecución
+      password: "IpssoftSicilia2019!",
+      confirmPassword: "IpssoftSicilia2019!",
+    },
+    expectedOutcome: "success",
+    // El mensaje de éxito puede variar, ajústalo según tu aplicación.
+    expectedMessage:
+      "Un correo fue enviado a su gmail, para verificar su cuenta.",
+  },
 ];
 
-for (const tc of testCases) {
-  test(`Escenario: ${tc.testName}`, async ({ page }) => {
-    const registerPage = new RegisterPage(page);
-    await registerPage.goto();
+test.describe("Pagina de registro de usuarios /alta-usuario", () => {
+  for (const tc of testCases) {
+    test(`Escenario: ${tc.testName}`, async ({ page }) => {
+      const registerPage = new RegisterPage(page);
+      await registerPage.goto();
 
-    // Rellenar el formulario usando el método del Page Object
-    await registerPage.fillForm(tc.data);
+      // Rellenar el formulario usando el método del Page Object
+      await registerPage.fillForm(tc.data);
 
-    // Enviar el formulario
-    await registerPage.submit();
+      // Enviar el formulario
+      await registerPage.submit();
 
-    // --- VERIFICACIÓN DE RESULTADOS USANDO MÉTODOS DEL PAGE OBJECT ---
-    if (tc.expectedOutcome === "success") {
-      // El test solo le pide al Page Object que verifique el éxito. No sabe cómo lo hace.
-      await registerPage.verifySuccess(tc.expectedMessage!);
-    } else {
-      // El test le pide al Page Object que verifique el error, pasándole el/los mensaje(s).
-      // Combinamos `expectedMessages` y `expectedMessage` para pasarlos al método de verificación.
-      const errorMessages = tc.expectedMessages || tc.expectedMessage;
-      if (errorMessages) {
-        await registerPage.verifyError(errorMessages);
+      // --- VERIFICACIÓN DE RESULTADOS USANDO MÉTODOS DEL PAGE OBJECT ---
+      if (tc.expectedOutcome === "success") {
+        // El test solo le pide al Page Object que verifique el éxito. No sabe cómo lo hace.
+        await registerPage.verifySuccess(tc.expectedMessage!);
       } else {
-        // Opcional: lanzar un error si un test de tipo 'error' no define un mensaje esperado.
-        throw new Error(
-          `Test case "${tc.testName}" is expected to fail but has no expectedMessage or expectedMessages.`
-        );
+        // El test le pide al Page Object que verifique el error, pasándole el/los mensaje(s).
+        // Combinamos `expectedMessages` y `expectedMessage` para pasarlos al método de verificación.
+        const errorMessages = tc.expectedMessages || tc.expectedMessage;
+        if (errorMessages) {
+          await registerPage.verifyError(errorMessages);
+        } else {
+          // Opcional: lanzar un error si un test de tipo 'error' no define un mensaje esperado.
+          throw new Error(
+            `Test case "${tc.testName}" is expected to fail but has no expectedMessage or expectedMessages.`
+          );
+        }
       }
-    }
-  });
-}
+    });
+  }
+});

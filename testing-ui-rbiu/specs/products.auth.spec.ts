@@ -5,7 +5,7 @@ import path from "path";
 import { EditProductPage } from "../pages/edit-product-page";
 import { MyProductsPage } from "../pages/my-products-page";
 
-test.describe("Pagina de Productos", () => {
+test.describe("Pagina de Mercado /mercado (Auth)", () => {
   let productsPage: ProductsPage;
   let createProductPage: CreateProductPage;
   let myProductsPage: MyProductsPage;
@@ -61,15 +61,15 @@ test.describe("Pagina de Productos", () => {
     await productsPage.verifyProductIsVisible(productData.name);
   });
 
-  // test("Buscar un producto inexistente", async () => {
-  //   const productName = "ProductoInexistente12345";
-  //   await productsPage.searchProduct(productName);
-  //   await productsPage.verifyProductIsNotVisible(productName);
-  // });
+  test("Buscar un producto inexistente", async () => {
+    const productName = "ProductoInexistente12345";
+    await productsPage.searchProduct(productName);
+    await productsPage.verifyProductIsNotVisible(productName);
+  });
 
-  // test("Buscar con campo de búsqueda vacío", async () => {
-  //   await productsPage.searchProduct("");
-  //   // Si se espera que la lista de productos esté visible (todos los productos):
-  //   await expect(productsPage.productList).toBeVisible();
-  // });
+  test("Buscar con campo de búsqueda vacío", async () => {
+    await productsPage.searchProduct("");
+    // Si se espera que la lista de productos esté visible (todos los productos):
+    await expect(productsPage.productList).toBeVisible();
+  });
 });

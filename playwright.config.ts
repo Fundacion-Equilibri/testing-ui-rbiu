@@ -12,7 +12,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  // Recomiendo centralizar todos los tests en una única carpeta para mayor claridad.
+  // Centralizamos todos los tests en una única carpeta para mayor claridad.
   testDir: "./testing-ui-rbiu",
   /* Run tests in files in parallel */
   fullyParallel: true,

@@ -3,7 +3,7 @@ import { LoginPage } from "../pages/login-page";
 import { HeaderPage } from "../pages/header-page";
 import { config } from "../config/configs";
 
-test.describe("Login de Usuarios", () => {
+test.describe("Login de Usuarios  /login", () => {
   let loginPage: LoginPage;
   let headerPage: HeaderPage;
 

@@ -31,6 +31,7 @@ export class CreateProductPage {
   readonly expirationYearSelect: Locator;
   readonly submitButton: Locator;
   readonly confirmationMessage: Locator;
+  readonly validationContainer: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -51,6 +52,8 @@ export class CreateProductPage {
     this.expirationYearSelect = page.getByRole("combobox", { name: "Año" });
     this.submitButton = page.getByRole("button", { name: /^Crear/i });
     this.confirmationMessage = page.locator("#gform_confirmation_message_9");
+    //Mensajes de errores
+    this.validationContainer = page.locator("#gform_9_validation_container");
   }
 
   // Métodos de acción
@@ -66,12 +69,12 @@ export class CreateProductPage {
     await this.cookieAcceptButton.click({ timeout: 3000 }).catch(() => {});
   }
 
-  async fillForm(data: ProductData) {
+  async fillForm(data: ProductData, file: boolean = true) {
     await this.productNameInput.fill(data.name);
     await this.priceInput.fill(data.price);
     await this.quantityInput.fill(data.quantity);
     await this.descriptionTextarea.fill(data.description);
-    await this.imageInput.setInputFiles(data.imagePath);
+    if (file) await this.imageInput.setInputFiles(data.imagePath);
     await this.visibleSelect.selectOption({ label: data.visible });
     await this.reservableSelect.selectOption({ label: data.reservable });
     await this.deliveryDetailsInput.fill(data.deliveryDetails);
@@ -88,5 +91,16 @@ export class CreateProductPage {
   async verifySuccess(productName: string) {
     const expectedText = `Tu producto ${productName} ha sido creado con éxito.`;
     await expect(this.confirmationMessage).toContainText(expectedText);
+  }
+
+  // Verificar mensaje o mensajes de error
+  async verifyErrorMessages(expectedMessages: string | string[]) {
+    await expect(this.validationContainer).toBeVisible();
+    const messages = Array.isArray(expectedMessages)
+      ? expectedMessages
+      : [expectedMessages];
+    for (const message of messages) {
+      await expect(this.validationContainer).toContainText(message);
+    }
   }
 }

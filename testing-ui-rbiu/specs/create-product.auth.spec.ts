@@ -5,32 +5,102 @@ import {
   CreateProductPage,
   type ProductData,
 } from "../pages/create-product-page";
+import { MyProductsPage } from "../pages/my-products-page";
+import { EditProductPage } from "../pages/edit-product-page";
 
-test("Crear un producto", async ({ page }) => {
-  const createProductPage = new CreateProductPage(page);
-  await createProductPage.goto();
-  await createProductPage.handleCookies();
+test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
+  test.describe("Flujo exitoso", () => {
+    let product: ProductData;
 
-  // Definimos los datos del producto en un objeto para mayor claridad.
-  const productName = "Aeronave F-22 Raptor " + Date.now();
-  const productData: ProductData = {
-    name: productName,
-    price: "50000",
-    quantity: "3",
-    description: "Aviones de combate utilizados en misiones de prueba.",
-    imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
-    visible: "Sí",
-    reservable: "No",
-    deliveryDetails:
-      "Las entregas de realizan desde las 08:00 hasta las 15:00 de lunes a viernes",
-    expirationDate: { day: "1", month: "12", year: "2025" },
-  };
+    test.beforeEach(() => {
+      const productName = "Aeronave F-22 Raptor " + Date.now();
+      product = {
+        name: productName,
+        price: "50000",
+        quantity: "3",
+        description: "Aviones de combate utilizados en misiones de prueba.",
+        imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
+        visible: "Sí",
+        reservable: "No",
+        deliveryDetails:
+          "Las entregas se realizan desde las 08:00 hasta las 15:00 de lunes a viernes",
+        expirationDate: { day: "1", month: "12", year: "2025" },
+      };
+    });
 
-  // Usamos los métodos del Page Object para interactuar con la página.
-  // El test es ahora mucho más legible.
-  await createProductPage.fillForm(productData);
-  await createProductPage.submit();
+    test.afterEach(async ({ page }) => {
+      const myProductsPage = new MyProductsPage(page);
+      const editProductPage = new EditProductPage(page);
 
-  // La verificación también se delega al Page Object.
-  await createProductPage.verifySuccess(productName);
+      await myProductsPage.goto();
+      await myProductsPage.editProduct(product.name);
+      await editProductPage.verifyPageLoaded();
+      await editProductPage.deleteProduct();
+    });
+
+    test("Debería crear un producto nuevo exitosamente", async ({ page }) => {
+      const createProductPage = new CreateProductPage(page);
+      await createProductPage.goto();
+      await createProductPage.handleCookies();
+
+      await createProductPage.fillForm(product);
+      await createProductPage.submit();
+
+      await createProductPage.verifySuccess(product.name);
+    });
+  });
+
+  test.describe("Validaciones de formulario", () => {
+    const baseProduct: ProductData = {
+      name: "Producto de prueba",
+      price: "100",
+      quantity: "10",
+      description: "Esta es una descripción de prueba.",
+      imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
+      visible: "Sí",
+      reservable: "No",
+      deliveryDetails: "Detalles de entrega.",
+      expirationDate: { day: "1", month: "12", year: "2025" },
+    };
+
+    const validationTestCases = [
+      {
+        case: "cuando el nombre está vacío",
+        productData: { ...baseProduct, name: "" },
+        expectedError: "Nombre del producto: Este campo es obligatorio.",
+      },
+      {
+        case: "cuando el precio es inferior a 1",
+        productData: { ...baseProduct, price: "0" },
+        expectedError:
+          "Precio (en logos): El precio no puede ser inferior a 1 λ.",
+      },
+      {
+        case: "cuando la descripción está vacía",
+        productData: { ...baseProduct, description: "" },
+        expectedError: "Descripción: Este campo es obligatorio.",
+      },
+      {
+        case: "cuando no se sube una imagen",
+        productData: { ...baseProduct, imagePath: "" }, // Asumimos que un path vacío significa no subir imagen
+        expectedError: "Imagen: Este campo es obligatorio.",
+      },
+    ];
+
+    for (const tc of validationTestCases) {
+      test(`debería mostrar un error ${tc.case}`, async ({ page }) => {
+        const createProductPage = new CreateProductPage(page);
+        await createProductPage.goto();
+        await createProductPage.handleCookies();
+
+        if (tc.productData.imagePath)
+          await createProductPage.fillForm(tc.productData);
+        else await createProductPage.fillForm(tc.productData, false);
+
+        await createProductPage.submit();
+
+        await createProductPage.verifyErrorMessages([tc.expectedError]);
+      });
+    }
+  });
 });

@@ -70,7 +70,7 @@ const testCases: TestCase[] = [
     data: {
       nombre: "Jaden",
       apellidos: "White Smith",
-      telefonoMovil: "74440470", // Este celuar debe ser existente
+      telefonoMovil: `${config.PHONE_NUMBER}`, // Este celuar debe ser existente
       fechaNacimiento: { dia: "1", mes: "12", anio: "2000" },
       nombrePublico: "JadenXR",
       presentacion: "Soy un gamer muy cotizado en el mundo extraterrestre", // campo opcional
@@ -93,7 +93,7 @@ const testCases: TestCase[] = [
       nombrePublico: "JadenXR",
       presentacion: "Soy un gamer muy cotizado en el mundo extraterrestre", // campo opcional
       direccion: "Cochabamba",
-      email: `crocha@fundacioequilibri.org`, // Este correo debe existir
+      email: `${config.EMAIL}`, // Este correo debe existir
       password: "IpssoftSicilia2019!",
       confirmPassword: "IpssoftSicilia2019!",
     },
@@ -129,7 +129,8 @@ const testCases: TestCase[] = [
       fechaNacimiento: { dia: "1", mes: "12", anio: "2000" },
       nombrePublico: "JadenXR",
       presentacion: "Soy un gamer muy cotizado en el mundo extraterrestre", // campo opcional
-      direccion: "Sucre",
+      ubicacion: "Bolivia",
+      direccion: "Calle Pisagua",
       email: `test.user.${Date.now()}@example.com`, // Email único para cada ejecución
       password: "IpssoftSicilia2019!",
       confirmPassword: "IpssoftSicilia2019!",
@@ -137,7 +138,7 @@ const testCases: TestCase[] = [
     expectedOutcome: "success",
     // El mensaje de éxito puede variar, ajústalo según tu aplicación.
     expectedMessage:
-      "Un correo fue enviado a su gmail, para verificar su cuenta.",
+      "¡Último paso! Verifica tu cuenta Te hemos enviado un correo electrónico de verificación. Si no lo encuentras, revisa tu carpeta de spam 😉",
   },
 ];
 

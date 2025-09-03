@@ -48,6 +48,29 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
 
       await createProductPage.verifySuccess(product.name);
     });
+
+    test("debería mostrar un error al intentar crear un producto con un nombre duplicado", async ({
+      page,
+    }) => {
+      const createProductPage = new CreateProductPage(page);
+
+      // --- 1. Crear el producto inicial ---
+      await createProductPage.goto();
+      await createProductPage.handleCookies();
+      await createProductPage.fillForm(product);
+      await createProductPage.submit();
+      await createProductPage.verifySuccess(product.name);
+
+      // --- 2. Intentar crear el mismo producto de nuevo ---
+      await createProductPage.goto(); // Volvemos a la página de creación
+      await createProductPage.fillForm(product);
+      await createProductPage.submit();
+
+      // --- 3. Verificar el mensaje de error ---
+      await createProductPage.verifyErrorMessages(
+        "Nombre del producto: Ya tienes un producto con el mismo nombre."
+      );
+    });
   });
 
   test.describe("Validaciones de formulario", () => {
@@ -112,7 +135,10 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
         await createProductPage.goto();
         await createProductPage.handleCookies();
         // Usamos un 'if' para decidir si llamamos a setInputFiles
-        await createProductPage.fillForm(tc.productData, !!tc.productData.imagePath);
+        await createProductPage.fillForm(
+          tc.productData,
+          !!tc.productData.imagePath
+        );
 
         await createProductPage.submit();
 

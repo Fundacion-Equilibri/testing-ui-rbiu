@@ -11,6 +11,7 @@ export interface RegistrationData {
   fechaNacimiento?: { dia: string; mes: string; anio: string };
   nombrePublico?: string;
   presentacion?: string;
+  ubicacion?: string;
   direccion?: string;
   email?: string;
   password?: string;
@@ -30,6 +31,7 @@ export class RegisterPage {
   readonly anioNacimientoSelect: Locator;
   readonly nombrePublicoInput: Locator;
   readonly presentacionTextarea: Locator;
+  readonly ubicacionInput: Locator;
   readonly direccionInput: Locator;
   readonly profileImageInput: Locator;
   readonly emailInput: Locator;
@@ -38,6 +40,7 @@ export class RegisterPage {
   readonly submitButton: Locator;
   readonly confirmationMessage: Locator;
   readonly validationContainer: Locator;
+  readonly mapLoadingIndicator: Locator;
   readonly imagePath = path.resolve(__dirname, "../../assets/jaden_smith.jpg");
 
   constructor(page: Page) {
@@ -52,14 +55,16 @@ export class RegisterPage {
     this.anioNacimientoSelect = this.form.getByRole("combobox", { name: "Año" });
     this.nombrePublicoInput = this.form.getByLabel("Nombre público*");
     this.presentacionTextarea = this.form.getByLabel("Mi presentación");
+    this.ubicacionInput = this.form.locator("#search");
     this.direccionInput = this.form.getByLabel("Dirección*");
     this.profileImageInput = this.form.locator('input[type="file"]');
     this.emailInput = this.form.getByLabel("Correo electrónico*");
     this.passwordInput = this.form.getByRole("textbox", { name: "Introduce la constraseña" });
     this.confirmPasswordInput = this.form.getByRole("textbox", { name: "Confirmar contraseña" });
     this.submitButton = this.form.getByRole("button", { name: "Regístrate" });
-    this.confirmationMessage = page.locator("#gform_confirmation_message_34");
+    this.confirmationMessage = page.locator("div.congratulations");
     this.validationContainer = page.locator("#gform_34_validation_container");
+    this.mapLoadingIndicator = this.form.locator('#map-container');
   }
 
   // Métodos de acción
@@ -79,7 +84,12 @@ export class RegisterPage {
     }
     if (data.nombrePublico !== undefined) await this.nombrePublicoInput.fill(data.nombrePublico);
     if (data.presentacion !== undefined) await this.presentacionTextarea.fill(data.presentacion);
-    if (data.direccion !== undefined) await this.direccionInput.fill(data.direccion);
+    if (data.ubicacion !== undefined) await this.ubicacionInput.fill(data.ubicacion);
+    if (data.direccion !== undefined) {
+      // Esperamos a que el indicador "Cargando..." del mapa desaparezca.
+      await expect(this.mapLoadingIndicator).toBeVisible({ timeout: 10000 });
+      await this.direccionInput.fill(data.direccion);
+    }
     if (data.email !== undefined) await this.emailInput.fill(data.email);
     if (data.password !== undefined) await this.passwordInput.fill(data.password);
     if (data.confirmPassword !== undefined) await this.confirmPasswordInput.fill(data.confirmPassword);
@@ -87,6 +97,7 @@ export class RegisterPage {
     // Rellenar campos comunes o con valores por defecto
     await this.nacionalidadSelect.selectOption({ label: "Argentina" });
     await this.profileImageInput.setInputFiles(this.imagePath);
+    if (data.direccion !== undefined) await this.direccionInput.fill(data.direccion);
   }
 
   async submit() {
@@ -106,4 +117,3 @@ export class RegisterPage {
     }
   }
 }
-

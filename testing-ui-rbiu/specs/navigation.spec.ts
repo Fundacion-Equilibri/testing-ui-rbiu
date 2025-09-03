@@ -85,4 +85,11 @@ test.describe("Navegación - Móvil (Visitante)", () => {
       }
     });
   }
+
+  test('El botón "Inicia sesión" navega a la página de login', async ({
+    page,
+  }) => {
+    await headerPage.getLoginButtonMovil().click();
+    await expect(page).toHaveURL(new RegExp(`${config.URL_BASE}/login/`));
+  });
 });

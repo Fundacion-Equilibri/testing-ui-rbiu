@@ -41,4 +41,8 @@ export class HeaderPage {
   getLoginButton(): Locator {
     return this.page.getByRole("link", { name: "Regístrate o Inicia sesión" });
   }
+  
+  getLoginButtonMovil(): Locator {
+    return this.page.getByRole("link", { name: "Iniciar sesión" });
+  }
 }

@@ -23,6 +23,7 @@ setup("Authenticacion de usuario", async ({ page }) => {
   await page.getByRole("button", { name: /iniciar sesión/i }).click();
 
   // Espera a que la página cargue después del login para asegurar que fue exitoso
+  // buscando el boton de crear producto
   await expect(
     page.getByRole("link", { name: /Crea tus productos/i })
   ).toBeVisible({ timeout: 30 * 1000 });

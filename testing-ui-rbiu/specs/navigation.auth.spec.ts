@@ -67,6 +67,28 @@ test.describe("Navegación - Escritorio (Visitante) Auth - Iconos", () => {
 });
 
 // ============================================================================
+//        NAVEGACION SUPERIOR ICONOS DE MENSAJES; NOTIFICACIONES Y PERFIL
+// ============================================================================
+test.describe("Navegación - Movil (Visitante) Auth - Iconos", () => {
+  // Usamos un viewport de móvil para este grupo de tests
+  test.use({ viewport: { width: 390, height: 844 } });
+  let headerPage: HeaderPage;
+
+  test.beforeEach(async ({ page }) => {
+    headerPage = new HeaderPage(page);
+    await headerPage.goto();
+  });
+
+  test("Ver los iconos de mensaje, notificaciones y perfil", async () => {
+    const containers = headerPage.getContainersFromNabBar();
+
+    for (const container of containers) {
+      await expect(container).toBeVisible();
+    }
+  });
+});
+
+// ============================================================================
 //                  NAVEGACION INFERIOR MOVIL
 // ============================================================================
 test.describe("Navegación - Móvil (Visitante) Auth", () => {

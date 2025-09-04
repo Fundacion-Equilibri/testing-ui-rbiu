@@ -31,53 +31,53 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
     productDetailsPage = new ProductDetailsPage(page);
   });
 
-    // test.describe("Flujo E2E: Crear, buscar y eliminar ", () => {
-    //   let product: ExtendedProductData;
+  // test.describe("Flujo E2E: Crear, buscar y eliminar ", () => {
+  //   let product: ExtendedProductData;
 
-    //   test.beforeEach(async ({ page }) => {
-    //     product = {
-    //       name: `Producto E2E ${Date.now()}`,
-    //       price: "123",
-    //       quantity: "1",
-    //       description: "Descripción para el test E2E.",
-    //       category:"Informática y tecnologías",
-    //       imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
-    //       visible: "Sí",
-    //       reservable: "No",
-    //       deliveryDetails: "Entrega inmediata.",
-    //       expirationDate: { day: "1", month: "1", year: "2026" },
-    //     };
+  //   test.beforeEach(async ({ page }) => {
+  //     product = {
+  //       name: `Producto E2E ${Date.now()}`,
+  //       price: "123",
+  //       quantity: "1",
+  //       description: "Descripción para el test E2E.",
+  //       category:"Informática y tecnologías",
+  //       imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
+  //       visible: "Sí",
+  //       reservable: "No",
+  //       deliveryDetails: "Entrega inmediata.",
+  //       expirationDate: { day: "1", month: "1", year: "2026" },
+  //     };
 
-    //     // Setup: Crear el producto antes del test
-    //     await createProductPage.goto();
-    //     await createProductPage.fillForm(product);
-    //     await createProductPage.submit();
-    //     await createProductPage.verifySuccess(product.name);
-    //   });
+  //     // Setup: Crear el producto antes del test
+  //     await createProductPage.goto();
+  //     await createProductPage.fillForm(product);
+  //     await createProductPage.submit();
+  //     await createProductPage.verifySuccess(product.name);
+  //   });
 
-    //   test.afterEach(async () => {
-    //     // Teardown: Limpiar el producto creado
-    //     try {
-    //       await myProductsPage.goto();
-    //       await myProductsPage.editProduct(product.name);
-    //       await editProductPage.verifyPageLoaded();
-    //       await editProductPage.deleteProduct();
-    //     } catch (error) {
-    //       console.warn(
-    //         `ADVERTENCIA: No se pudo limpiar el producto "${product.name}" en el afterEach.`
-    //       );
-    //     }
-    //   });
+  //   test.afterEach(async () => {
+  //     // Teardown: Limpiar el producto creado
+  //     try {
+  //       await myProductsPage.goto();
+  //       await myProductsPage.editProduct(product.name);
+  //       await editProductPage.verifyPageLoaded();
+  //       await editProductPage.deleteProduct();
+  //     } catch (error) {
+  //       console.warn(
+  //         `ADVERTENCIA: No se pudo limpiar el producto "${product.name}" en el afterEach.`
+  //       );
+  //     }
+  //   });
 
-    //   test("Debería crear, buscar, y luego eliminar un producto", async () => {
-    //     // Act: Buscar el producto en la página de mercado
-    //     await productsPage.goto();
-    //     await productsPage.searchProduct(product.name);
+  //   test("Debería crear, buscar, y luego eliminar un producto", async () => {
+  //     // Act: Buscar el producto en la página de mercado
+  //     await productsPage.goto();
+  //     await productsPage.searchProduct(product.name);
 
-    //     // Assert: Verificar que el producto se encuentra
-    //     await productsPage.verifyProductIsVisible(product.name);
-    //   });
-    // });
+  //     // Assert: Verificar que el producto se encuentra
+  //     await productsPage.verifyProductIsVisible(product.name);
+  //   });
+  // });
 
   test.describe("Filtrado de productos", () => {
     const productsToClean: string[] = [];
@@ -116,6 +116,7 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
       // Act & Assert
       await productsPage.goto();
       await productsPage.filterByCategory("Telefonía móvil");
+      await productsPage.searchProduct(productTelefonía.name);
       await productsPage.verifyProductIsVisible(productTelefonía.name);
 
       await productsPage.filterByCategory("Ropa y accesorios");
@@ -146,10 +147,11 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
       // Act & Assert
       await productsPage.goto();
       await productsPage.filterByCountry("Bolivia");
+      await productsPage.searchProduct(productBolivia.name);
       await productsPage.verifyProductIsVisible(productBolivia.name);
-      
-      await productsPage.goto();
+
       await productsPage.filterByCountry("España");
+      await productsPage.searchProduct(productBolivia.name);
       await productsPage.verifyProductIsNotVisible(productBolivia.name);
     });
   });

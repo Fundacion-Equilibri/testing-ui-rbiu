@@ -32,7 +32,7 @@ export class ProductsPage {
   // Busca un producto con un nombre
   async searchProduct(productName: string) {
     await this.searchInput.fill(productName);
-    await this.searchInput.press("Enter", { timeout: 2000 });
+    await this.searchIcon.click();
     // Esperar a que las llamadas de red finalicen después de la búsqueda
     await this.page.waitForLoadState("networkidle");
   }
@@ -49,10 +49,7 @@ export class ProductsPage {
 
   // Hace click en un producto
   async clickProduct(productName: string) {
-    const product = this.productList.locator(".card-demand", {
-      hasText: productName,
-    });
-    await product.click();
+    await this.getProductCard(productName).click();
   }
 
   // Filtra los productos por categoria

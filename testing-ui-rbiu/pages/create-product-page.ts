@@ -7,6 +7,7 @@ export interface ProductData {
   price: string;
   quantity: string;
   description: string;
+  category: string;
   imagePath: string;
   visible: "Sí" | "No";
   reservable: "Sí" | "No";
@@ -22,6 +23,7 @@ export class CreateProductPage {
   readonly priceInput: Locator;
   readonly quantityInput: Locator;
   readonly descriptionTextarea: Locator;
+  readonly categorySelect: Locator;
   readonly imageInput: Locator;
   readonly visibleSelect: Locator;
   readonly reservableSelect: Locator;
@@ -43,6 +45,7 @@ export class CreateProductPage {
     this.priceInput = page.getByLabel("Precio (en logos)*");
     this.quantityInput = page.getByLabel("Cantidad");
     this.descriptionTextarea = page.getByLabel("Descripción*");
+    this.categorySelect = page.getByRole("combobox", { name: "Categoría" });
     this.imageInput = page.getByLabel("Imagen*");
     this.visibleSelect = page.getByRole("combobox", { name: "Visible" });
     this.reservableSelect = page.getByRole("combobox", { name: "Reservable" });
@@ -74,6 +77,7 @@ export class CreateProductPage {
     await this.priceInput.fill(data.price);
     await this.quantityInput.fill(data.quantity);
     await this.descriptionTextarea.fill(data.description);
+    await this.categorySelect.selectOption(data.category)
     if (file) await this.imageInput.setInputFiles(data.imagePath);
     await this.visibleSelect.selectOption({ label: data.visible });
     await this.reservableSelect.selectOption({ label: data.reservable });

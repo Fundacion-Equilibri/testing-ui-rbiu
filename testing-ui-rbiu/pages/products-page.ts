@@ -4,7 +4,6 @@ import { config } from "../config/configs";
 // PAGINA DE MERCADO  ->  /mercado
 export class ProductsPage {
   readonly page: Page;
-  readonly productList: Locator;
   readonly searchInput: Locator;
   readonly searchIcon: Locator;
   readonly categoryFilter: Locator;
@@ -15,13 +14,16 @@ export class ProductsPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.productList = page.locator(".container-market");
     this.searchInput = page.getByPlaceholder("Buscar productos o servicios");
     this.searchIcon = page.locator("#searchled");
     this.categoryFilter = page.locator("#filterbycategory");
     this.countryFilter = page.locator("#filterbycountry");
     this.productListContainer = page.locator("#container-market");
-    this.loadMoreButton = page.locator("#ver_mas_productos a");
+    // Se prioriza getByRole por ser más resiliente. El regex /Ver \d+ productos más/i
+    // asegura que funcione aunque el número de productos cambie.
+    this.loadMoreButton = page.getByRole("link", {
+      name: /Ver \d+ productos más/i,
+    });
     this.loader = page.locator("#loader_more_products");
   }
   // Navega a la pagina de productos
@@ -69,7 +71,8 @@ export class ProductsPage {
   // Hace click en el boton de cargar mas productos
   async loadMoreProducts() {
     await this.loadMoreButton.click();
-    // Esperar a que el loader aparezca y luego desaparezca
+    // Es una mejor práctica esperar a que el loader sea visible y luego esperar a que se oculte.
+    // Esto evita race conditions donde el loader aparece y desaparece muy rápido.
     await expect(this.loader).toBeVisible();
     await expect(this.loader).toBeHidden({ timeout: 10000 });
   }

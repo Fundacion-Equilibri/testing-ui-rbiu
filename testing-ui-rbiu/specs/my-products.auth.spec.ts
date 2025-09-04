@@ -1,16 +1,15 @@
 import { test, expect } from "@playwright/test";
+import path from "path";
+
 import {
   CreateProductPage,
   type ProductData,
 } from "../pages/create-product-page";
 import { MyProductsPage } from "../pages/my-products-page";
 import { EditProductPage } from "../pages/edit-product-page";
-import path from "path";
-import { ProductsPage } from "../pages/products-page";
 
-test.describe("Gestión de Mis Productos", () => {
+test.describe("Pagina de Mis Productos /mis-productos (Auth)", () => {
   let createProductPage: CreateProductPage;
-  let productsPage: ProductsPage;
   let myProductsPage: MyProductsPage;
   let editProductPage: EditProductPage;
   let productData: ProductData;
@@ -20,7 +19,6 @@ test.describe("Gestión de Mis Productos", () => {
   test.beforeEach(async ({ page }) => {
     // Inicializamos las páginas aquí para que estén disponibles en todos los tests del describe.
     createProductPage = new CreateProductPage(page);
-    productsPage = new ProductsPage(page);
     myProductsPage = new MyProductsPage(page);
     editProductPage = new EditProductPage(page);
 
@@ -39,19 +37,18 @@ test.describe("Gestión de Mis Productos", () => {
     };
   });
 
-  // test('El producto creado aparece en la lista de "Mis productos"', async (page) => {
-  //   // Usamos las instancias de Page Objects creadas en el `beforeEach`.
-  //   await createProductPage.goto();
-  //   await createProductPage.fillForm(productData);
-  //   await createProductPage.submit();
-  //   await createProductPage.verifySuccess(productData.name);
-
-  //   await myProductsPage.goto();
-  //   await myProductsPage.verifyProductIsListed(
-  //     productData.name,
-  //     productData.price
-  //   );
-  // });
+  test('Verifica que el boton "Crea un producto" exista y navegue a la página de creación', async ({
+    page,
+  }) => {
+    // 1. Navegar a la página "Mis Productos"
+    await myProductsPage.goto();
+    // 2. Verificar que el botón es visible
+    await myProductsPage.verifyButtonCreateProductIsVisible();
+    // 3. Hacer clic en el botón
+    await myProductsPage.clickButtonCreateProduct();
+    // 4. Verificar que la URL es la correcta después del clic
+    await expect(page).toHaveURL(/.*\/crea-un-producto\/?/);
+  });
 
   test("Se puede eliminar un producto desde la página de edición", async () => {
     // Paso 1: Crear un producto para asegurarnos de que existe algo que eliminar.
@@ -61,11 +58,9 @@ test.describe("Gestión de Mis Productos", () => {
     await createProductPage.verifySuccess(productData.name);
 
     // Paso 2: Ir a la pagina de edicion y eliminar producto
-    await productsPage.goto();
-    await productsPage.searchProduct(productData.name); // Busca el producto
-    await productsPage.verifyProductIsVisible(productData.name); // Verifica que existe
-
-    await myProductsPage.editProduct(productData.name);
+    await myProductsPage.goto();
+    await myProductsPage.verifyProductIsListed(productData.name, productData.price)
+    await myProductsPage.editProduct(productData.name); // Verifica que existe el producto creado
 
     // Paso 3: Verificar que estamos en la página de edición y eliminar el producto.
     await editProductPage.verifyPageLoaded();

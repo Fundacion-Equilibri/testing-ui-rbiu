@@ -5,11 +5,15 @@ export class MyProductsPage {
   readonly page: Page;
   readonly pageTitle: Locator;
   readonly productList: Locator;
+  readonly createProductButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.pageTitle = page.getByRole("heading", { name: "Mis productos" });
     this.productList = page.locator(".genericList");
+    this.createProductButton = page.getByRole("link", {
+      name: "Crea un producto",
+    });
   }
 
   async goto() {
@@ -30,6 +34,12 @@ export class MyProductsPage {
     await productCard.click();
   }
 
+  // METODO QUE HACE CLICK EN EL BOTON
+  async clickButtonCreateProduct() {
+    // De la lista de productos hacer click en el producto y navega a dicho producto
+    await this.createProductButton.click();
+  }
+
   // METODO PARA VERIFICAR QUE EL PRODUCTO EXISTE
   async verifyProductIsListed(name: string, price: string) {
     const productCard = this.getProductCardByName(name);
@@ -45,12 +55,17 @@ export class MyProductsPage {
   }
 
   // VERIFICA QUE UN PRODUCTO CON UN NOMBRE ESPECIFICO NO ESTE VISIBLE EN LA LISTA
-  async verifyProductIsNotListed(productName: string): Promise<void> {
+  async verifyProductIsNotListed(productName: string) {
     // Usamos el mismo selector que en `verifyProductIsListed` pero negamos la aserción.
     const productLocator = this.productList.locator(".elementList", {
       hasText: productName,
     });
     await expect(productLocator).not.toBeVisible();
+  }
+
+  // Verifica que el botón "Crea un producto" es visible.
+  async verifyButtonCreateProductIsVisible() {
+    await expect(this.createProductButton).toBeVisible();
   }
 
   // Opción extra: Método que devuelve boolean (sin aserciones)

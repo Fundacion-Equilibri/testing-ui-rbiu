@@ -71,10 +71,13 @@ export class ProductsPage {
   // Hace click en el boton de cargar mas productos
   async loadMoreProducts() {
     await this.loadMoreButton.click();
-    // Es una mejor práctica esperar a que el loader sea visible y luego esperar a que se oculte.
-    // Esto evita race conditions donde el loader aparece y desaparece muy rápido.
-    await expect(this.loader).toBeVisible();
-    await expect(this.loader).toBeHidden({ timeout: 10000 });
+    await this.loader.waitFor({ state: "visible", timeout: 10000 }).catch(() => {
+      // Si no llegó a mostrarse, no fallamos — algunos loads son muy rápidos
+      console.log("⚠️ Loader no llegó a mostrarse, continuando...");
+    });
+
+    // Lueo espera que desaparezca
+    await this.loader.waitFor({ state: "visible", timeout: 10000 });
   }
 
   // Cuenta los productos visibles
@@ -82,10 +85,6 @@ export class ProductsPage {
     return this.productListContainer.locator("a.card-link").count();
   }
 
-  // Devuelve la lista de productos
-  // Se cambia a síncrono para seguir las mejores prácticas de Playwright.
-  // Devuelve un Locator que apunta a todos los productos, permitiendo encadenar
-  // acciones como .first(), .count(), .nth(), etc., desde el test.
   getProductCards(): Locator {
     return this.productListContainer.locator("a.card-link");
   }

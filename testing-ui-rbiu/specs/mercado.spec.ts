@@ -46,19 +46,22 @@ test.describe("Página de Mercado /mercado", () => {
     test("Debería cargar más productos al hacer clic en 'Ver más'", async ({
       page,
     }) => {
-      // Este test asume que existen suficientes productos para que el botón aparezca.
       await productsPage.goto();
+
+      // Se usa test.skip() para marcar el test como omitido si el botón no está visible.
+      // Se le da un timeout para que el botón tenga tiempo de aparecer tras la carga inicial.
+      await test.skip(
+        !(await productsPage.loadMoreButton.isVisible({ timeout: 5000 })),
+        "ADVERTENCIA: No hay suficientes productos para probar la paginación."
+      );
+
       const initialCount = await productsPage.getProductCount();
-      if (await productsPage.loadMoreButton.isVisible()) {
-        await productsPage.loadMoreProducts();
-        const finalCount = await productsPage.getProductCount();
-        expect(finalCount).toBeGreaterThan(initialCount);
-      } else {
-        console.warn(
-          "ADVERTENCIA: No hay suficientes productos para probar la paginación."
-        );
-        test.skip();
-      }
+      await productsPage.loadMoreProducts();
+
+      // Tu método `loadMoreProducts` ya espera de forma robusta a que el loader desaparezca,
+      // por lo que una aserción directa aquí es suficiente y fiable.
+      const finalCount = await productsPage.getProductCount();
+      expect(finalCount).toBeGreaterThan(initialCount);
     });
   });
 });

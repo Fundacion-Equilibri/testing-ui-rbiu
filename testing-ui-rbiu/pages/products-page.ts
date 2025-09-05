@@ -82,6 +82,14 @@ export class ProductsPage {
     return this.productListContainer.locator("a.card-link").count();
   }
 
+  // Devuelve la lista de productos
+  // Se cambia a síncrono para seguir las mejores prácticas de Playwright.
+  // Devuelve un Locator que apunta a todos los productos, permitiendo encadenar
+  // acciones como .first(), .count(), .nth(), etc., desde el test.
+  getProductCards(): Locator {
+    return this.productListContainer.locator("a.card-link");
+  }
+
   //  Encuentra un producto por el nombre del producto
   getProductCard(productName: string): Locator {
     return this.productListContainer.locator("a.card-link", {

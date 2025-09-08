@@ -74,6 +74,7 @@ export class RegisterPage {
   }
 
   async fillForm(data: RegistrationData) {
+    await this.page.waitForLoadState("networkidle"); // Esperar a cargar el mapa
     if (data.nombre !== undefined) await this.nombreInput.fill(data.nombre);
     if (data.apellidos !== undefined) await this.apellidosInput.fill(data.apellidos);
     if (data.telefonoMovil !== undefined) await this.telefonoMovilInput.fill(data.telefonoMovil);
@@ -106,7 +107,7 @@ export class RegisterPage {
 
   // Métodos de aserción/verificación
   async verifySuccess(expectedMessage: string) {
-    await expect(this.confirmationMessage).toContainText(expectedMessage);
+    await expect(this.confirmationMessage).toContainText(expectedMessage, { timeout: 10000 });
   }
 
   async verifyError(expectedMessages: string | string[]) {

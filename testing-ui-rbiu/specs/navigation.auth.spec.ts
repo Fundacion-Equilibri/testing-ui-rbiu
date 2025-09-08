@@ -9,6 +9,13 @@ const navLinks = [
   { name: "Invitaciones", path: "/invita-amigo/" },
   // Este enlace abre una nueva pestaña, el test lo manejará correctamente.
 ];
+const navLinksOwn = [
+  { name: "Mis productos", path: "/mis-productos" },
+  { name: "Mis necesidades", path: "/mis-necesidades/" },
+  { name: "Mis Intercambios", path: "/mis-intercambios" },
+  { name: "Crear entidad", optional: true, path: "/crear-comunidad" },
+  // { name: "Cerrar sesión", path: "/wp-login.php?action=logout" },
+];
 
 // ============================================================================
 //                  NAVEGACION SUPERIOR ESCRITORIO
@@ -122,4 +129,48 @@ test.describe("Navegación - Móvil (Visitante) Auth", () => {
       }
     });
   }
+});
+
+// ============================================================================
+//                  NAVEGACION SUPERIOR ESCRITORIO DEL SUBMENU
+// ============================================================================
+test.describe("Navegación - Escritorio (Auth) - Submenú de perfil", () => {
+  let headerPage: HeaderPage;
+
+  test.beforeEach(async ({ page }) => {
+    headerPage = new HeaderPage(page);
+    await headerPage.goto();
+  });
+
+  // Filtramos los enlaces para probar la navegación principal por separado del logout.
+  // El logout cambia el estado de la sesión y es mejor probarlo de forma aislada.
+  const mainSubMenuLinks = navLinksOwn.filter(
+    (link) => link.name !== "Cerrar sesión"
+  );
+
+  for (const link of mainSubMenuLinks) {
+    test(`El enlace del submenú "${link.name}" navega a la página correcta`, async ({
+      page,
+    }) => {
+      await headerPage.openSubMenu();
+      await expect(headerPage.profileSubMenu).toBeVisible();
+
+      await headerPage.clickSubMenuLink(link.name);
+
+      await expect(page).toHaveURL(
+        new RegExp(`${config.URL_BASE}${link.path}`)
+      );
+    });
+  }
+
+  test('El enlace "Cerrar sesión" finaliza la sesión correctamente', async ({
+    page,
+  }) => {
+    await headerPage.openSubMenu();
+    await headerPage.clickSubMenuLink("Cerrar sesión");
+
+    // Después de cerrar sesión, verificamos que somos redirigidos a la página de inicio
+    await expect(page).toHaveURL(new RegExp(`${config.URL_BASE}/`));
+    await expect(headerPage.getLoginButton()).toBeVisible();
+  });
 });

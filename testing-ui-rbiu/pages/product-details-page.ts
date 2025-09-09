@@ -8,11 +8,18 @@ export class ProductDetailsPage {
   readonly sellerName: Locator;
   readonly editProductButton: Locator;
   readonly startExchangeButton: Locator;
+  readonly loginButton: Locator;
   readonly vendedorTab: Locator;
   readonly chatTab: Locator;
+  readonly cardDialog: Locator;
 
   constructor(page: Page) {
     this.page = page;
+
+    this.cardDialog = page.getByText(
+      "Inicia sesión para poder realizar intercambios y comunicarte con el vendedor.",
+      { exact: true }
+    );
 
     // --- Localizadores de la sección de detalles del producto ---
     this.productTitle = page.locator("p.demand-title-select");
@@ -23,6 +30,10 @@ export class ProductDetailsPage {
     this.sellerName = page.locator(
       ".select-chat-header-user .card-text-select"
     );
+
+    // --- Botón para iniciar sessio(solo visible para usuarios no logueados)
+    // El elemento clicable es un div con una clase específica que contiene el texto.
+    this.loginButton = page.locator("div.inicia-intercambio");
 
     // --- Botón para editar un producto (solo visible si el producto es del usuario actual)
     this.editProductButton = page.getByText("Editar producto", {
@@ -36,7 +47,7 @@ export class ProductDetailsPage {
 
     // --- Localizadores de las pestañas ---
     this.vendedorTab = page.getByText("Vendedor", { exact: true });
-    this.chatTab = page.getByText("Chat", { exact: true });
+    this.chatTab = page.locator("#tab2", { hasText: "Chat" });
   }
 
   /**
@@ -61,6 +72,10 @@ export class ProductDetailsPage {
    */
   async clickExchangeProduct() {
     await this.startExchangeButton.click();
+  }
+
+  async clickLoginButton() {
+    await this.loginButton.click();
   }
 
   async switchToChatTab() {

@@ -28,6 +28,7 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
       name: `Producto de Test ${Date.now()}`,
       price: "150,50",
       description: "Descripción detallada del producto de prueba.",
+      category: "Alimentación",
       deliveryDetails: "Detalles de entrega",
       imagePath: path.join(__dirname, "../../assets/SAMSUNG-S24.jpg"),
       quantity: "10",
@@ -146,4 +147,28 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
   //   await expect(productDetailsPage.startExchangeButton).toBeVisible();
   //   // Hacer click en el boton de Iniciar Intercambio
   // });
+
+  test(`Testeando los tabs de Vendedor | Chat`, async ({ page }) => {
+    // Crear un producto que vamos a editar.
+    await createProductPage.goto();
+    await createProductPage.fillForm(product);
+    await createProductPage.submit();
+    await createProductPage.verifySuccess(product.name);
+
+    // Navegar a la página de  ->  /mercado    donde se listan todos los productos de todos los usuarios
+    await productsPage.goto();
+    await productsPage.searchProduct(product.name);
+    await productsPage.verifyProductIsVisible(product.name);
+    await productsPage.clickProduct(product.name); // Esto navega a prduct/?id=400  ejemplo
+
+    // Assert: Verificar que los detalles mostrados en la página son los correctos.
+    await productDetailsPage.verifyPageLoaded();
+    // En la ruta dinamica de /product?id= y uno o más dígitos". busca el patron
+    await expect(page).toHaveURL(/.*\/producto\/\?id=\d+/);
+    await expect(productDetailsPage.productTitle).toHaveText(product.name);
+    // Usamos toContainText para el precio por si la UI le añade símbolos como '€' o '$'.
+    await expect(productDetailsPage.productPrice).toContainText(product.price);
+
+    await productDetailsPage.switchToChatTab();
+  });
 });

@@ -54,36 +54,36 @@ export class NeedsPage {
   //   await this.getProductCard(productName).click();
   // }
 
-  // // Filtra los productos por categoria
-  // async filterByCategory(category: string) {
-  //   await this.categoryFilter.selectOption({
-  //     label: category || "Todas las categorías",
-  //   });
-  //   await this.page.waitForLoadState("networkidle");
-  // }
+  // Filtra los productos por categoria
+  async filterByCategory(category: string) {
+    await this.categoryFilter.selectOption({
+      label: category || "Todas las categorías",
+    });
+    await this.page.waitForLoadState("networkidle");
+  }
 
-  // // Filtra los productos por pais+
-  // async filterByCountry(country: string) {
-  //   await this.countryFilter.selectOption({ label: country });
-  //   await this.page.waitForLoadState("networkidle");
-  // }
+  // Filtra los productos por pais+
+  async filterByCountry(country: string) {
+    await this.countryFilter.selectOption({ label: country });
+    await this.page.waitForLoadState("networkidle");
+  }
 
-  // // Hace click en el boton de cargar mas productos
-  // async loadMoreProducts() {
-  //   await this.loadMoreButton.click();
-  //   await this.loader.waitFor({ state: "visible", timeout: 10000 }).catch(() => {
-  //     // Si no llegó a mostrarse, no fallamos — algunos loads son muy rápidos
-  //     console.log("⚠️ Loader no llegó a mostrarse, continuando...");
-  //   });
+  // Hace click en el boton de cargar mas productos
+  async loadMoreProducts() {
+    await this.loadMoreButton.click();
+    await this.loader.waitFor({ state: "visible", timeout: 10000 }).catch(() => {
+      // Si no llegó a mostrarse, no fallamos — algunos loads son muy rápidos
+      console.log("⚠️ Loader no llegó a mostrarse, continuando...");
+    });
 
-  //   // Lueo espera que desaparezca
-  //   await this.loader.waitFor({ state: "visible", timeout: 10000 });
-  // }
+    // Lueo espera que desaparezca
+    await this.loader.waitFor({ state: "visible", timeout: 10000 });
+  }
 
-  // // Cuenta los productos visibles
-  // async getProductCount(): Promise<number> {
-  //   return this.productListContainer.locator("a.card-link").count();
-  // }
+  // Cuenta los productos visibles
+  async getProductCount(): Promise<number> {
+    return this.productListContainer.locator("a.card-link").count();
+  }
 
   getProductCards(): Locator {
     return this.productListContainer.locator("a.card-link");
@@ -96,13 +96,13 @@ export class NeedsPage {
   //   });
   // }
 
-  // // Hace click en el boton de cookies
-  // async handleCookies() {
-  //   // Este método es un placeholder. Si aparece un banner de cookies,
-  //   // la lógica para aceptarlo iría aquí.
-  //   const acceptButton = this.page.getByRole("button", { name: /Aceptar/i });
-  //   if (await acceptButton.isVisible({ timeout: 2000 })) {
-  //     await acceptButton.click();
-  //   }
-  // }
+  // Hace click en el boton de cookies
+  async handleCookies() {
+    // Este método es un placeholder. Si aparece un banner de cookies,
+    // la lógica para aceptarlo iría aquí.
+    const acceptButton = this.page.getByRole("button", { name: /Aceptar/i });
+    if (await acceptButton.isVisible({ timeout: 2000 })) {
+      await acceptButton.click();
+    }
+  }
 }

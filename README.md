@@ -4,7 +4,21 @@
  
  ## 1. Prerrequisitos
  
- Antes de poder ejecutar las pruebas, es necesario instalar todas las dependencias del proyecto. Esto solo se necesita hacer una vez, o cada vez que se añadan nuevas dependencias.
+Antes de poder ejecutar las pruebas, es necesario configurar el entorno y las dependencias.
+ 
+### 1.1. Variables de Entorno (Credenciales)
+ 
+El proyecto utiliza un archivo `.env` para gestionar credenciales y URLs de prueba.
+ 
+1.  Busca el archivo `example.env` en la raíz del proyecto.
+2.  Crea una copia de este archivo y renómbrala a `.env`.
+3.  Abre el nuevo archivo `.env` y rellena los valores con tus credenciales.
+ 
+> **Importante:** El archivo `.env` está excluido del control de versiones por seguridad.
+ 
+### 1.2. Instalar Dependencias
+ 
+Una vez configuradas las variables de entorno, instala las dependencias del proyecto. Esto solo se necesita hacer una vez, o cada vez que se añadan nuevas librerías.
  
  ```bash
  npm install

@@ -1,7 +1,7 @@
 // tests/crear-producto.spec.ts
 import { test, expect } from "@playwright/test";
 import path from "path";
-import { CreateNeedPage, NeedData } from "../pages/create-need-page";
+import { CreateNeedPage, type NeedData } from "../pages/create-need-page";
 import { MyNeedsPage } from "../pages/my-needs-page";
 import { EditNeedPage } from "../pages/edit-need-page";
 
@@ -37,16 +37,15 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
       await editNeedPage.deleteNeed();
     });
 
-    // test("Debería crear una necesidad nueva exitosamente", async ({ page }) => {
-    //   const createNeedPage = new CreateNeedPage(page);
-    //   await createNeedPage.goto();
-    //   await createNeedPage.handleCookies();
+    test("Debería crear una necesidad nueva exitosamente", async ({ page }) => {
+      const createNeedPage = new CreateNeedPage(page);
+      await createNeedPage.goto();
+      await createNeedPage.handleCookies();
+      await createNeedPage.fillForm(product);
+      await createNeedPage.submit();
 
-    //   await createNeedPage.fillForm(product);
-    //   await createNeedPage.submit();
-
-    //   await createNeedPage.verifySuccess(product.name);
-    // });
+      await createNeedPage.verifySuccess(product.name);
+    });
 
     test("Debería mostrar un error al intentar crear una necesidad con un nombre duplicado", async ({
       page,
@@ -73,78 +72,77 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
     });
   });
 
-  // test.describe("Validaciones de formulario", () => {
-  //   const baseProduct: ProductData = {
-  //     name: "Producto de prueba",
-  //     price: "100",
-  //     quantity: "10",
-  //     description: "Esta es una descripción de prueba.",
-  //     category: "Informática y tecnologías",
-  //     imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
-  //     visible: "Sí",
-  //     reservable: "No",
-  //     deliveryDetails: "Detalles de entrega.",
-  //     expirationDate: { day: "1", month: "12", year: "2025" },
-  //   };
+  test.describe("Validaciones de formulario", () => {
+    const baseNeed: NeedData = {
+      name: "Producto de prueba",
+      minPrice: "100",
+      maxPrice: "200",
+      needDetails: "Esta es una descripción de prueba.",
+      reasonNeed: "Razón de la necesidad.",
+      category: "Informática y tecnologías",
+      imagePath: path.resolve(__dirname, "../../assets/F-22A_Raptor.jpg"),
+      visible: "Sí",
+    };
 
-  //   const validationTestCases = [
-  //     {
-  //       case: "cuando todos los campos están vacíos",
-  //       productData: {
-  //         ...baseProduct,
-  //         name: "",
-  //         price: "",
-  //         quantity: "",
-  //         description: "",
-  //         imagePath: "",
-  //         deliveryDetails: "",
-  //         expirationDate: { day: "", month: "", year: "" },
-  //       },
-  //       expectedError: [
-  //         "Nombre del producto: Este campo es obligatorio.",
-  //         "Precio (en logos): El precio no puede ser inferior a 1 λ.",
-  //         "Descripción: Este campo es obligatorio.",
-  //         "Imagen: Este campo es obligatorio.",
-  //       ],
-  //     },
-  //     {
-  //       case: "cuando el nombre está vacío",
-  //       productData: { ...baseProduct, name: "" },
-  //       expectedError: "Nombre del producto: Este campo es obligatorio.",
-  //     },
-  //     {
-  //       case: "cuando el precio es inferior a 1",
-  //       productData: { ...baseProduct, price: "0" },
-  //       expectedError:
-  //         "Precio (en logos): El precio no puede ser inferior a 1 λ.",
-  //     },
-  //     {
-  //       case: "cuando la descripción está vacía",
-  //       productData: { ...baseProduct, description: "" },
-  //       expectedError: "Descripción: Este campo es obligatorio.",
-  //     },
-  //     {
-  //       case: "cuando no se sube una imagen",
-  //       productData: { ...baseProduct, imagePath: "" }, // Asumimos que un path vacío significa no subir imagen
-  //       expectedError: "Imagen: Este campo es obligatorio.",
-  //     },
-  //   ];
+    const validationTestCases = [
+      {
+        case: "cuando todos los campos están vacíos",
+        productData: {
+          ...baseNeed,
+          name: "",
+          minPrice: "",
+          maxPrice: "",
+          needDetails: "",
+          reasonNeed: "",
+          imagePath: "",
+        },
+        expectedError: [
+          "¿Qué necesitas?: Este campo es obligatorio.",
+          "Detalla un poco más lo que necesitas: Este campo es obligatorio.",
+          "Explícanos que uso le vas a dar y el motivo de la necesidad: Este campo es obligatorio.",
+          "Precio mínimo (en logos): El precio mínimo no puede ser inferior a 1 λ.",
+          "Precio máximo (en logos): El precio máximo no puede ser inferior a 1 λ.",
+          "Imagen: Este campo es obligatorio.",
+        ],
+      },
+      {
+        case: "cuando el nombre está vacío",
+        productData: { ...baseNeed, name: "" },
+        expectedError: "¿Qué necesitas?: Este campo es obligatorio.",
+      },
+      {
+        case: "cuando el precio es inferior a 1",
+        productData: { ...baseNeed, minPrice: "0" },
+        expectedError:
+          "Precio mínimo (en logos): El precio mínimo no puede ser inferior a 1 λ.",
+      },
+      {
+        case: "cuando la descripción está vacía",
+        productData: { ...baseNeed, needDetails: "" },
+        expectedError: "Detalla un poco más lo que necesitas: Este campo es obligatorio.",
+      },
+      {
+        case: "cuando no se sube una imagen",
+        productData: { ...baseNeed, imagePath: "" }, // Asumimos que un path vacío significa no subir imagen
+        expectedError: "Imagen: Este campo es obligatorio.",
+      },
+    ];
 
-  //   for (const tc of validationTestCases) {
-  //     test(`debería mostrar un error ${tc.case}`, async ({ page }) => {
-  //       const createProductPage = new CreateProductPage(page);
-  //       await createProductPage.goto();
-  //       await createProductPage.handleCookies();
-  //       // Usamos un 'if' para decidir si llamamos a setInputFiles
-  //       await createProductPage.fillForm(
-  //         tc.productData,
-  //         !!tc.productData.imagePath
-  //       );
+    for (const tc of validationTestCases) {
+      test(`debería mostrar un error ${tc.case}`, async ({ page }) => {
+        const createNeedPage = new CreateNeedPage(page);
+        await createNeedPage.goto();
+        await createNeedPage.handleCookies();
+        // Usamos un 'if' para decidir si llamamos a setInputFiles
+        await createNeedPage.fillForm(
+          tc.productData,
+          !!tc.productData.imagePath
+        );
 
-  //       await createProductPage.submit();
+        await createNeedPage.submit();
 
-  //       await createProductPage.verifyErrorMessages(tc.expectedError);
-  //     });
-  //   }
-  // });
+        await createNeedPage.verifyErrorMessages(tc.expectedError);
+      });
+    }
+  });
 });

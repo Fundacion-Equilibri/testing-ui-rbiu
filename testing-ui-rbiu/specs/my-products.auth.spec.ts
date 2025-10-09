@@ -32,6 +32,7 @@ test.describe("Pagina de Mis Productos /mis-productos (Auth)", () => {
       imagePath: path.resolve(__dirname, "../../assets/product.jpg"),
       visible: "Sí",
       reservable: "No",
+      category: "Transportes y desplazamientos",
       deliveryDetails: "Entrega en mano en la zona centro.",
       expirationDate: { day: "15", month: "11", year: "2025" },
     };

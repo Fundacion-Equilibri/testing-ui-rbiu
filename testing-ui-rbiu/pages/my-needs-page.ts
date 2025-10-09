@@ -43,12 +43,34 @@ export class MyNeedsPage {
   async verifyNeedIsListed(name: string, minPrice: string, maxPrice: string) {
     const needCard = this.getNeedCardByName(name);
 
-    // 1. Verifica que el contenedor de la necesidad sea visible.
+    // 1️⃣ Verifica que el contenedor de la necesidad sea visible
     await expect(needCard).toBeVisible();
 
-    // 2. Verifica que el nombre y el precio dentro de ese contenedor sean correctos.
-    await expect(needCard.locator("p.name")).toHaveText(name);
-    await expect(needCard.locator("p.min-price")).toHaveText(minPrice);
-    await expect(needCard.locator("p.max-price")).toHaveText(maxPrice);
+    // 2️⃣ Verifica que el nombre esté correcto
+    await expect(needCard.locator("p.name")).toContainText(name);
+
+    // 3️⃣ Verifica que el precio contenga ambos valores dentro del mismo párrafo
+    const priceLocator = needCard.locator("p.precio");
+    await expect(priceLocator).toContainText(minPrice);
+    await expect(priceLocator).toContainText(maxPrice);
+  }
+
+
+  // VERIFICA QUE UN PRODUCTO CON UN NOMBRE ESPECIFICO NO ESTE VISIBLE EN LA LISTA
+  async verifyNeedIsNotListed(needName: string) {
+    // Usamos el mismo selector que en `verifyNeedIsListed` pero negamos la aserción.
+    const needCard = this.getNeedCardByName(needName);
+    await expect(needCard).not.toBeVisible();
+  }
+
+  // Verifica que el botón "Crea una necesidad" es visible.
+  async verifyButtonCreateNeedIsVisible() {
+    await expect(this.createNeedButton).toBeVisible();
+  }
+
+  // Opción extra: Método que devuelve boolean (sin aserciones)
+  async isNeedListed(name: string): Promise<boolean> {
+    const needCard = this.getNeedCardByName(name);
+    return await needCard.isVisible();
   }
 }

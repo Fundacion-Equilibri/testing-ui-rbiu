@@ -9,6 +9,7 @@ export class NeedsPage {
   readonly categoryFilter: Locator;
   readonly countryFilter: Locator;
   readonly productListContainer: Locator;
+  readonly shareNeedButton: Locator;
   readonly loadMoreButton: Locator;
   readonly loader: Locator;
 
@@ -19,8 +20,9 @@ export class NeedsPage {
     this.categoryFilter = page.locator("#filterbycategory");
     this.countryFilter = page.locator("#filterbycountry");
     this.productListContainer = page.locator("#container-market");
-    // Se prioriza getByRole por ser más resiliente. El regex /Ver \d+ productos más/i
-    // asegura que funcione aunque el número de productos cambie.
+    this.shareNeedButton = page.getByRole("link", {
+      name: "Comparte tus necesidades",
+    });
     this.loadMoreButton = page.getByRole("link", {
       name: /Ver \d+ necesidades más/i,
     });
@@ -31,30 +33,45 @@ export class NeedsPage {
     await this.page.goto(`${config.URL_BASE}/necesidades`);
   }
 
-  // Busca un producto con un nombre
-  // async searchProduct(productName: string) {
-  //   await this.searchInput.fill(productName);
-  //   await this.searchIcon.click();
-  //   // Esperar a que las llamadas de red finalicen después de la búsqueda
-  //   await this.page.waitForLoadState("networkidle");
+  async verifyPageLoaded() {
+    await expect(this.page).toHaveURL(/.*\/necesidades/);
+    await expect(this.categoryFilter).toBeVisible();
+    await expect(this.countryFilter).toBeVisible();
+    await this.handleCookies();
+  }
+
+  async verifyShareNeedButtonVisible() {
+    await expect(this.shareNeedButton).toBeVisible();
+  }
+
+  // Busca una necesidad con un nombre
+  async searchNeed(needName: string) {
+    await this.searchInput.fill(needName);
+    await this.searchIcon.click();
+    // Esperar a que las llamadas de red finalicen después de la búsqueda
+    await this.page.waitForLoadState("networkidle");
+  }
+
+  // Verifica que la necesidad exista con un nombre
+  async verifyNeedIsVisible(needName: string) {
+    await expect(this.getNeedCard(needName)).toBeVisible();
+  }
+
+  async isNeedListed(needName: string): Promise<boolean> {
+    return await this.getNeedCard(needName).isVisible();
+  }
+
+  // // Verifica que la necesidad no este presente con un nombre
+  // async verifyNeedIsNotVisible(needName: string) {
+  //   await expect(this.getNeedCard(needName)).not.toBeVisible();
   // }
 
-  // // Verifica que el producto exista con un nombre
-  // async verifyProductIsVisible(productName: string) {
-  //   await expect(this.getProductCard(productName)).toBeVisible();
-  // }
+  // Hace click en una necesidad
+  async clickNeed(needName: string) {
+    await this.getNeedCard(needName).click();
+  }
 
-  // // Verifica que el producto no este presente con un nombre
-  // async verifyProductIsNotVisible(productName: string) {
-  //   await expect(this.getProductCard(productName)).not.toBeVisible();
-  // }
-
-  // // Hace click en un producto
-  // async clickProduct(productName: string) {
-  //   await this.getProductCard(productName).click();
-  // }
-
-  // Filtra los productos por categoria
+  // Filtra las necesidades por categoria
   async filterByCategory(category: string) {
     await this.categoryFilter.selectOption({
       label: category || "Todas las categorías",
@@ -71,12 +88,13 @@ export class NeedsPage {
   // Hace click en el boton de cargar mas productos
   async loadMoreProducts() {
     await this.loadMoreButton.click();
-    await this.loader.waitFor({ state: "visible", timeout: 10000 }).catch(() => {
-      // Si no llegó a mostrarse, no fallamos — algunos loads son muy rápidos
-      console.log("⚠️ Loader no llegó a mostrarse, continuando...");
-    });
+    await this.loader
+      .waitFor({ state: "visible", timeout: 10000 })
+      .catch(() => {
+        // Si no llegó a mostrarse, no fallamos — algunos loads son muy rápidos
+        console.log("⚠️ Loader no llegó a mostrarse, continuando...");
+      });
 
-    // Lueo espera que desaparezca
     await this.loader.waitFor({ state: "visible", timeout: 10000 });
   }
 
@@ -89,17 +107,16 @@ export class NeedsPage {
     return this.productListContainer.locator("a.card-link");
   }
 
-  // //  Encuentra un producto por el nombre del producto
-  // getProductCard(productName: string): Locator {
-  //   return this.productListContainer.locator("a.card-link", {
-  //     hasText: productName,
-  //   });
-  // }
+  //  Encuentra una necesidad por el nombre de la necesidad
+  getNeedCard(needName: string): Locator {
+    return this.productListContainer.locator("a.card-link", {
+      hasText: needName ,
+    });
+  }
 
   // Hace click en el boton de cookies
   async handleCookies() {
     // Este método es un placeholder. Si aparece un banner de cookies,
-    // la lógica para aceptarlo iría aquí.
     const acceptButton = this.page.getByRole("button", { name: /Aceptar/i });
     if (await acceptButton.isVisible({ timeout: 2000 })) {
       await acceptButton.click();

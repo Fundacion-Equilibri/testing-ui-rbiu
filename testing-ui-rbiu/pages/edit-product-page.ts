@@ -18,6 +18,10 @@ export class EditProductPage {
   }
 
   async verifyPageLoaded() {
+    // Expresion regular para verificar que estamos en la URL correcta /modifica-un-producto/?id=495
+    await expect(this.page).toHaveURL(/.*\/modifica-un-producto\/\?id=\d+/, {
+      timeout: 30000,
+    });
     // Añadimos un timeout explícito para dar margen a que la página cargue completamente.
     await expect(this.pageTitle).toBeVisible({ timeout: 10000 });
   }

@@ -6,7 +6,8 @@
   "scripts": {
     "headed": "npx playwright test --headed",
     "debug": "npx playwright test --debug",
-    "test": "npx playwright test"
+    "test": "npx playwright test",
+    "start": "npx http-server ./ -p 3000"
   },
   "keywords": [],
   "author": "",

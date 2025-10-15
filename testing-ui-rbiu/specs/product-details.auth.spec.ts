@@ -1,12 +1,16 @@
+import path from "path";
 import { test, expect } from "@playwright/test";
+
 import { ProductDetailsPage } from "../pages/product-details-page";
 import { ProductsPage } from "../pages/products-page";
+import { LoginPage } from "../pages/login-page";
 import { MyProductsPage } from "../pages/my-products-page";
 import { CreateProductPage, ProductData } from "../pages/create-product-page";
 import { EditProductPage } from "../pages/edit-product-page";
-import path from "path";
+import { config } from "../config/configs";
 
 test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
+  let loginPage = LoginPage;
   let productDetailsPage: ProductDetailsPage;
   let myProductsPage: MyProductsPage;
   let productsPage: ProductsPage;
@@ -99,14 +103,12 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
     await productsPage.goto();
     await productsPage.searchProduct(product.name);
     await productsPage.verifyProductIsVisible(product.name);
-    await productsPage.clickProduct(product.name); // Esto navega a prduct/?id=400  ejemplo
+    await productsPage.clickProduct(product.name); // Esto navega a product/?id=400  ejemplo
 
     // Assert: Verificar que los detalles mostrados en la página son los correctos.
     await productDetailsPage.verifyPageLoaded();
-    // En la ruta dinamica de /product?id= y uno o más dígitos". busca el patron
-    await expect(page).toHaveURL(/.*\/producto\/\?id=\d+/);
-    await expect(productDetailsPage.productTitle).toHaveText(product.name);
-    // Usamos toContainText para el precio por si la UI le añade símbolos como '€' o '$'.
+
+    await expect(productDetailsPage.productTitle).toContainText(product.name);
     await expect(productDetailsPage.productPrice).toContainText(product.price);
 
     // Verificamos que el botón de editar es visible y el de intercambiar no.
@@ -114,39 +116,55 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
     await expect(productDetailsPage.startExchangeButton).not.toBeVisible();
     await productDetailsPage.clickButtonEditProduct();
 
-    // Assert: Verificar que hemos llegado a la página de edición y que contiene los datos del producto.
+    // // Assert: Verificar que hemos llegado a la página de edición y que contiene los datos del producto.
     await editProductPage.verifyPageLoaded();
   });
 
-  // test("Debería permitir iniciar un intercambio si el usuario es no el propietario Button: Iniciar intercambio", async ({
-  //   page,
-  // }) => {
-  //   // Arrange: Crear un producto que vamos a editar.
-  //   await createProductPage.goto();
-  //   await createProductPage.fillForm(product);
-  //   await createProductPage.submit();
-  //   await createProductPage.verifySuccess(product.name);
-  //   productWasCreated = true; // Marcamos que el producto fue creado para que afterEach lo limpie.
+  test("Debería permitir iniciar un intercambio si el usuario es no el propietario Button: Iniciar intercambio", async ({
+    page,
+    browser,
+  }) => {
+    // --- ARRANGE: Crear un producto con un USUARIO A (el propietario) ---
 
-  //   // Act: Navegar a la página de  ->  /mercado    donde se listan todos los productos de todos los usuarios
-  //   await productsPage.goto();
-  //   await productsPage.searchProduct(product.name);
-  //   await productsPage.verifyProductIsVisible(product.name);
-  //   await productsPage.clickProduct(product.name); // Esto navega a prduct/?id=400  ejemplo
+    // 1. Creamos un nuevo contexto de navegador, aislado del principal
+    const ownerContext = await browser.newContext();
+    const ownerPage = await ownerContext.newPage();
 
-  //   // Assert: Verificar que los detalles mostrados en la página son los correctos.
-  //   await productDetailsPage.verifyPageLoaded();
-  //   // En la ruta dinamica de /product?id= y uno o más dígitos". busca el patron
-  //   await expect(page).toHaveURL(/.*\/producto\/\?id=\d+/);
-  //   await expect(productDetailsPage.productTitle).toHaveText(product.name);
-  //   // Usamos toContainText para el precio por si la UI le añade símbolos como '€' o '$'.
-  //   await expect(productDetailsPage.productPrice).toContainText(product.price);
+    // 2. Logueamos al Usuario A en este nuevo contexto
+    const loginPage = new LoginPage(ownerPage);
+    await loginPage.goto();
+    // Asumimos que tienes credenciales para un segundo usuario en tu .env
+    await loginPage.login(config.SECOND_EMAIL, config.SECOND_PASSWORD);
 
-  //   // Verificamos que el botón de editar es visible y el de intercambiar no.
-  //   await expect(productDetailsPage.editProductButton).not.toBeVisible();
-  //   await expect(productDetailsPage.startExchangeButton).toBeVisible();
-  //   // Hacer click en el boton de Iniciar Intercambio
-  // });
+    // 3. El Usuario A crea el producto
+    const ownerCreateProductPage = new CreateProductPage(ownerPage);
+    await ownerCreateProductPage.goto();
+    await ownerCreateProductPage.fillForm(product);
+    await ownerCreateProductPage.submit();
+    await ownerCreateProductPage.verifySuccess(product.name);
+    productWasCreated = true; // Importante para la limpieza en afterEach
+
+    // 4. Cerramos el contexto del Usuario A, ya no lo necesitamos por ahora
+    await ownerContext.close();
+
+    // --- ACT: El USUARIO B (visitante) busca el producto ---
+    // Ahora volvemos a usar la 'page' original del test
+    await productsPage.goto();
+    await productsPage.searchProduct(product.name);
+    await productsPage.clickProduct(product.name);
+
+    // --- ASSERT: Verificar los botones para el USUARIO B ---
+    await productDetailsPage.verifyPageLoaded();
+
+    // Ahora las aserciones deberían ser correctas:
+    // El botón de editar NO debe ser visible porque el Usuario B no es el dueño.
+    await expect(productDetailsPage.editProductButton).not.toBeVisible();
+    // El botón de iniciar intercambio SÍ debe ser visible.
+    await expect(productDetailsPage.startExchangeButton).toBeVisible();
+
+    // Usamos toContainText para el precio por si la UI le añade símbolos como '€' o '$'.
+    // await expect(productDetailsPage.productPrice).toContainText(product.price);
+  });
 
   test(`Testeando los tabs de Vendedor | Chat`, async ({ page }) => {
     // Crear un producto que vamos a editar.

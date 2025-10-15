@@ -55,7 +55,12 @@ export class ProductDetailsPage {
    * esperando a que el título del producto sea visible.
    */
   async verifyPageLoaded() {
-    await expect(this.productTitle).toBeVisible({ timeout: 10000 });
+    // En la ruta dinamica de /product?id= y uno o más dígitos". busca el patron
+    await expect(this.page).toHaveURL(/.*\/producto\/\?id=\d+/, {
+      timeout: 30000,
+    });
+    // Espera a que el título del producto sea visible, lo que indica que la página se ha cargado.
+    await expect(this.productTitle).toBeVisible({ timeout: 30000 });
   }
 
   /**

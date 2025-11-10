@@ -9,7 +9,7 @@ import { CreateProductPage, ProductData } from "../pages/create-product-page";
 import { EditProductPage } from "../pages/edit-product-page";
 import { config } from "../config/configs";
  
-test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
+test.describe("Página de Detalles del Producto - Usuario Autenticado  /producto/?id=", () => {
   // let loginPage = LoginPage; No se usa, se puede eliminar.
   let productDetailsPage: ProductDetailsPage;
   let myProductsPage: MyProductsPage;
@@ -37,13 +37,14 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
       deliveryDetails: "Detalles de entrega",
       imagePath: path.join(__dirname, "../../assets/SAMSUNG-S24.jpg"),
       quantity: "10",
-      expirationDate: { day: `20`, month: `12`, year: `2025` },
+      expirationDate: { day: `${new Date().getDate()}`, month: `${new Date().getMonth() + 1}`, year: `${new Date().getFullYear()}` },
       visible: "Sí",
       reservable: "Sí",
     };
 
     // Arrange: Crear un producto para asegurar un estado conocido y predecible.
     await createProductPage.goto();
+    await createProductPage.handleCookies();
     await createProductPage.fillForm(product);
     await createProductPage.submit();
     await createProductPage.verifySuccess(product.name);
@@ -79,13 +80,14 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
       deliveryDetails: "Detalles de entrega",
       imagePath: path.join(__dirname, "../../assets/SAMSUNG-S24.jpg"),
       quantity: "5",
-      expirationDate: { day: `10`, month: `11`, year: `2024` },
+      expirationDate: { day: `${new Date().getDate()}`, month: `${new Date().getMonth() + 1}`, year: `${new Date().getFullYear()}` },
       visible: "Sí",
       reservable: "No",
     };
 
     // Arrange: Crear un producto que vamos a editar.
     await createProductPage.goto();
+    await createProductPage.handleCookies();
     await createProductPage.fillForm(product);
     await createProductPage.submit();
     await createProductPage.verifySuccess(product.name);
@@ -130,7 +132,7 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
         deliveryDetails: "Entrega a convenir",
         imagePath: path.join(__dirname, "../../assets/F-22A_Raptor.jpg"),
         quantity: "1",
-        expirationDate: { day: `1`, month: `1`, year: `2026` },
+        expirationDate: { day: `${new Date().getDate()}`, month: `${new Date().getMonth() + 1}`, year: `${new Date().getFullYear()}` },
         visible: "Sí",
         reservable: "Sí",
       };
@@ -190,13 +192,14 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado", () => {
       deliveryDetails: "Detalles",
       imagePath: path.join(__dirname, "../../assets/SAMSUNG-S24.jpg"),
       quantity: "1",
-      expirationDate: { day: `1`, month: `1`, year: `2025` },
+      expirationDate: { day: `${new Date().getDate()}`, month: `${new Date().getMonth() + 1}`, year: `${new Date().getFullYear()}` },
       visible: "Sí",
       reservable: "Sí",
     };
     // Crear un producto que vamos a editar.
     await createProductPage.goto();
     await createProductPage.fillForm(product);
+    await createProductPage.handleCookies();
     await createProductPage.submit();
     await createProductPage.verifySuccess(product.name);
 

@@ -67,6 +67,7 @@ test.describe("Pagina de Necesidades    /necesidades  (Auth)", () => {
       page,
     }) => {
       await createNeedPage.goto();
+      await createNeedPage.handleCookies();
       await createNeedPage.fillForm(needData);
       await createNeedPage.submit();
       await createNeedPage.verifySuccess(needData.name);
@@ -99,6 +100,7 @@ test.describe("Pagina de Necesidades    /necesidades  (Auth)", () => {
       page,
     }) => {
       await createNeedPage.goto();
+      await createNeedPage.handleCookies();
       await createNeedPage.fillForm(needData);
       await createNeedPage.submit();
       await createNeedPage.verifySuccess(needData.name);
@@ -112,7 +114,7 @@ test.describe("Pagina de Necesidades    /necesidades  (Auth)", () => {
       await expect(page).toHaveURL(/.*\/necesidad\/\?id=\d+/);
     });
 
-    test("Debería cargar más necesidades al hacer clic en 'Ver más'", async ({
+    test("Debería cargar más necesidades al hacer clic en 'Ver más' Auth", async ({
       page,
     }) => {
       await needsPage.goto();
@@ -126,7 +128,6 @@ test.describe("Pagina de Necesidades    /necesidades  (Auth)", () => {
 
       const initialCount = await needsPage.getProductCount();
       await needsPage.loadMoreProducts();
-
       // Tu método `loadMoreProducts` ya espera de forma robusta a que el loader desaparezca,
       // por lo que una aserción directa aquí es suficiente y fiable.
       const finalCount = await needsPage.getProductCount();

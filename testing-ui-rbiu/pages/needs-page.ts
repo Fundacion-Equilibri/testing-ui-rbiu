@@ -95,7 +95,7 @@ export class NeedsPage {
         console.log("⚠️ Loader no llegó a mostrarse, continuando...");
       });
 
-    await this.loader.waitFor({ state: "visible", timeout: 10000 });
+    await this.loader.waitFor({ state: "hidden", timeout: 10000 });
   }
 
   // Cuenta los productos visibles

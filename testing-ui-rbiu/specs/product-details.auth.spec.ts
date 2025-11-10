@@ -180,6 +180,9 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado  /producto
       await productDetailsPage.verifyPageLoaded();
       await expect(productDetailsPage.editProductButton).not.toBeVisible();
       await expect(productDetailsPage.startExchangeButton).toBeVisible();
+
+      // --- ACT: El USUARIO B inicia el intercambio ---
+      await productDetailsPage.clickExchangeProduct();
     });
   });
 

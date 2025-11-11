@@ -33,7 +33,7 @@ export class NeedDetailsPage {
     });
 
     // --- Botón para editar un producto (solo visible si el producto es del usuario actual)
-    this.editProductButton = page.getByText("Editar producto", {
+    this.editProductButton = page.getByText("Editar necesidad", {
       exact: true,
     });
 

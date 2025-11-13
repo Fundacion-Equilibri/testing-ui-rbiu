@@ -184,48 +184,24 @@ test.describe("Página de Detalles del Producto - Usuario Autenticado  /producto
       // --- ACT: El USUARIO B inicia el intercambio ---
       await productDetailsPage.clickExchangeProduct();
     });
+
+    test(`Testeando los tabs de Vendedor | Chat`, async ({ page }) => {
+      // Navegar a la página de  ->  /mercado    donde se listan todos los productos de todos los usuarios
+      await productsPage.goto();
+      await productsPage.searchProduct(product.name);
+      await productsPage.verifyProductIsVisible(product.name);
+      await productsPage.clickProduct(product.name); // Esto navega a prduct/?id=400  ejemplo
+  
+      // Assert: Verificar que los detalles mostrados en la página son los correctos.
+      await productDetailsPage.verifyPageLoaded();
+      // En la ruta dinamica de /product?id= y uno o más dígitos". busca el patron
+      await expect(page).toHaveURL(/.*\/producto\/\?id=\d+/);
+      await expect(productDetailsPage.productTitle).toHaveText(product.name);
+      // Usamos toContainText para el precio por si la UI le añade símbolos como '€' o '$'.
+      await expect(productDetailsPage.productPrice).toContainText(product.price);
+  
+      await productDetailsPage.switchToChatTab();
+    });
   });
 
-  test(`Testeando los tabs de Vendedor | Chat`, async ({ page }) => {
-    const product: ProductData = {
-      name: `Producto Tabs ${Date.now()}`,
-      price: "10",
-      description: "Test de tabs.",
-      category: "Alimentación",
-      deliveryDetails: "Detalles",
-      imagePath: path.join(__dirname, "../../assets/SAMSUNG-S24.jpg"),
-      quantity: "1",
-      expirationDate: { day: `${new Date().getDate()}`, month: `${new Date().getMonth() + 1}`, year: `${new Date().getFullYear()}` },
-      visible: "Sí",
-      reservable: "Sí",
-    };
-    // Crear un producto que vamos a editar.
-    await createProductPage.goto();
-    await createProductPage.fillForm(product);
-    await createProductPage.handleCookies();
-    await createProductPage.submit();
-    await createProductPage.verifySuccess(product.name);
-
-    // Navegar a la página de  ->  /mercado    donde se listan todos los productos de todos los usuarios
-    await productsPage.goto();
-    await productsPage.searchProduct(product.name);
-    await productsPage.verifyProductIsVisible(product.name);
-    await productsPage.clickProduct(product.name); // Esto navega a prduct/?id=400  ejemplo
-
-    // Assert: Verificar que los detalles mostrados en la página son los correctos.
-    await productDetailsPage.verifyPageLoaded();
-    // En la ruta dinamica de /product?id= y uno o más dígitos". busca el patron
-    await expect(page).toHaveURL(/.*\/producto\/\?id=\d+/);
-    await expect(productDetailsPage.productTitle).toHaveText(product.name);
-    // Usamos toContainText para el precio por si la UI le añade símbolos como '€' o '$'.
-    await expect(productDetailsPage.productPrice).toContainText(product.price);
-
-    await productDetailsPage.switchToChatTab();
-
-    // Teardown: Limpiar el producto creado.
-    await myProductsPage.goto();
-    await myProductsPage.editProduct(product.name);
-    await editProductPage.verifyPageLoaded();
-    await editProductPage.deleteProduct();
-  });
 });

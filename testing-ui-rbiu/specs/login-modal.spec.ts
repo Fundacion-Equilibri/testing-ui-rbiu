@@ -1,38 +1,55 @@
 import { test, expect } from "@playwright/test";
 import { config } from "../config/configs";
 
-test.describe("Modal de login", () => {
-  test("Login fallido con modal por credenciales incorrectos", async ({
-    page,
-  }) => {
-    await page.goto(`${config.URL_BASE}`);
-    const credentials = {
-      email: "correo@ejemplo.com",
-      password: "contraseña123",
-    };
+// Definimos los casos de prueba fuera del test para mayor claridad.
+const failedLoginCases = [
+  {
+    case: "correo inexistente",
+    email: "emailInexistente@test.com",
+    password: "contraseña123",
+    expectedMessage: "El correo electrónico no existe.",
+  },
+  {
+    case: "cuenta no verificada",
+    email: "bifave2594@baxidy.com", // Correo registrado pero sin validar
+    password: "contraseña123",
+    expectedMessage: "Tu cuenta aún no está verificada. Revisa tu correo",
+  },
+  {
+    case: "contraseña incorrecta",
+    email: config.EMAIL!, // Usamos un correo válido de la configuración
+    password: "contraseñaIncorrecta123",
+    expectedMessage: "Credenciales inválidas. Inténtalo de nuevo.",
+  },
+];
 
-    // Esperar y llenar el email
-    const email = page.getByPlaceholder("Correo electrónico o usuario");
-    await expect(email).toBeVisible();
-    await email.fill(credentials.email);
+test.describe("Modal de login   /mercado", () => {
+  // Iteramos sobre cada caso de prueba para crear un test individual.
+  for (const credentials of failedLoginCases) {
+    test(`Login fallido con ${credentials.case}`, async ({ page }) => {
+      await page.goto(`${config.URL_BASE}`);
 
-    // Esperar y llenar la contraseña (modal)
-    // Acotar la búsqueda al contenedor del formulario para evitar ambigüedad
-    const loginForm = page.locator("#mb-login_form_container");
-    const password = loginForm.getByPlaceholder("Contraseña");
-    await expect(password).toBeVisible();
-    await password.fill(credentials.password);
+      // Esperar y llenar el email
+      const emailInput = page.getByPlaceholder("Correo electrónico o usuario");
+      await expect(emailInput).toBeVisible();
+      await emailInput.fill(credentials.email);
 
-    // Enviar formulario
-    await page.getByRole("button", { name: /iniciar sesión/i }).click();
+      // Esperar y llenar la contraseña (acotando al modal)
+      const loginForm = page.locator("#mb-login_form_container");
+      const passwordInput = loginForm.getByPlaceholder("Contraseña");
+      await expect(passwordInput).toBeVisible();
+      await passwordInput.fill(credentials.password);
 
-    // Verificar que el login fallo y muestra un mensaje
-    await expect(
-      page.locator("#mb-login_form_container p", {
-        hasText: "Su intento de inicio de sesión no tuvo éxito",
-      })
-    ).toBeVisible({ timeout: 5000 });
-  });
+      // Enviar formulario
+      await page.getByRole("button", { name: /iniciar sesión/i }).click();
+
+      // Verificar que el mensaje de error esperado es visible
+      const errorMessage = loginForm.locator("p", {
+        hasText: credentials.expectedMessage,
+      });
+      await expect(errorMessage).toBeVisible({ timeout: 5000 });
+    });
+  }
 
   test("Click en el enlace Olvidó su contraseña y navegar a la página de restaurar contraseña", async ({
     page,

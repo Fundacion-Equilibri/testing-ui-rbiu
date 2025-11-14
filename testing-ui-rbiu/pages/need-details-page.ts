@@ -1,10 +1,9 @@
 import { type Locator, type Page, expect } from "@playwright/test";
 
-export class ProductDetailsPage {
+export class NeedDetailsPage {
   readonly page: Page;
   readonly productTitle: Locator;
   readonly productPrice: Locator;
-  readonly productStock: Locator;
   readonly sellerName: Locator;
   readonly editProductButton: Locator;
   readonly startExchangeButton: Locator;
@@ -16,15 +15,11 @@ export class ProductDetailsPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.cardDialog = page.getByText(
-      "Inicia sesión para poder realizar intercambios y comunicarte con el vendedor.",
-      { exact: true }
-    );
+    this.cardDialog = page.locator("#card-dialog");
 
     // --- Localizadores de la sección de detalles del producto ---
     this.productTitle = page.locator("p.demand-title-select");
     this.productPrice = page.locator("p.demand-price-select");
-    this.productStock = page.locator("p.stock-txt");
 
     // --- Localizadores de la sección del vendedor y acciones ---
     this.sellerName = page.locator(
@@ -33,10 +28,12 @@ export class ProductDetailsPage {
 
     // --- Botón para iniciar sessio(solo visible para usuarios no logueados)
     // El elemento clicable es un div con una clase específica que contiene el texto.
-    this.loginButton = page.locator("div.inicia-intercambio");
+    this.loginButton = page.locator("div.inicia-intercambio", {
+      hasText: "Inicia sesión",
+    });
 
     // --- Botón para editar un producto (solo visible si el producto es del usuario actual)
-    this.editProductButton = page.getByText("Editar producto", {
+    this.editProductButton = page.getByText("Editar necesidad", {
       exact: true,
     });
 
@@ -55,12 +52,7 @@ export class ProductDetailsPage {
    * esperando a que el título del producto sea visible.
    */
   async verifyPageLoaded() {
-    // En la ruta dinamica de /product?id= y uno o más dígitos". busca el patron
-    await expect(this.page).toHaveURL(/.*\/producto\/\?id=\d+/, {
-      timeout: 30000,
-    });
-    // Espera a que el título del producto sea visible, lo que indica que la página se ha cargado.
-    await expect(this.productTitle).toBeVisible({ timeout: 30000 });
+    await expect(this.productTitle).toBeVisible({ timeout: 10000 });
   }
 
   /**
@@ -70,6 +62,10 @@ export class ProductDetailsPage {
    */
   async clickButtonEditProduct() {
     await this.editProductButton.click();
+  }
+
+  async dialogVisible(paragraph: string) {
+    await expect(this.cardDialog).toContainText(paragraph);
   }
 
   /**

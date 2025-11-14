@@ -6,7 +6,7 @@ import { config } from "../config/configs";
 const navLinks = [
   { name: "Mercado", path: "/mercado/" },
   { name: "Necesidades", path: "/necesidades/" },
-  { name: "Proyecto RBIU", path: "https://project.rbiu.org/en/" },
+  { name: "Proyecto RBIU", mobileName: "RBIU", path: "https://project.rbiu.org/en/" },
   { name: "Métricas", path: "/ver-resultados/" },
   { name: "Contacto", path: "/contacta-con-nosotros/" },
   // Este enlace abre una nueva pestaña, el test lo manejará correctamente.
@@ -72,7 +72,8 @@ test.describe("Navegación - Móvil (Visitante)", () => {
       page,
       context,
     }) => {
-      const navLink = headerPage.getNavLinkMovil(link.name);
+      const linkName = link.mobileName ?? link.name;
+      const navLink = headerPage.getNavLinkMovil(linkName);
 
       if ((await navLink.getAttribute("target")) === "_blank") {
         const pagePromise = context.waitForEvent("page");

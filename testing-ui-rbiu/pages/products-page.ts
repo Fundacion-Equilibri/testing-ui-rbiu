@@ -35,22 +35,31 @@ export class ProductsPage {
   async searchProduct(productName: string) {
     await this.searchInput.fill(productName);
     await this.searchIcon.click();
-    // Esperar a que las llamadas de red finalicen después de la búsqueda
-    await this.page.waitForLoadState("networkidle");
+    // RECOMENDACIÓN: Reemplazar 'networkidle' por una espera explícita.
+    // Esperamos a que el contenedor de productos se actualice.
+    // Una buena señal es que el loader aparezca y luego desaparezca.
+    // Esto es más fiable que esperar a que la red esté inactiva.
+    await this.waitForProductsToLoad();
   }
 
   // Verifica que el producto exista con un nombre
   async verifyProductIsVisible(productName: string) {
-    await expect(this.getProductCard(productName)).toBeVisible();
+    // Se añade un timeout a la aserción para dar tiempo a que el elemento
+    // aparezca después de una acción asíncrona como buscar o filtrar.
+    await expect(this.getProductCard(productName)).toBeVisible({ timeout: 10000 });
   }
 
   // Verifica que el producto no este presente con un nombre
   async verifyProductIsNotVisible(productName: string) {
-    await expect(this.getProductCard(productName)).not.toBeVisible();
+    // Se añade un timeout a la aserción para confirmar que el elemento
+    // realmente no aparece después de un tiempo prudencial.
+    await expect(this.getProductCard(productName)).not.toBeVisible({ timeout: 5000 });
   }
 
   // Hace click en un producto
   async clickProduct(productName: string) {
+    // Añadimos una espera para asegurar que el producto es visible antes de hacer clic.
+    await this.verifyProductIsVisible(productName);
     await this.getProductCard(productName).click();
   }
 
@@ -59,27 +68,34 @@ export class ProductsPage {
     await this.categoryFilter.selectOption({
       label: category || "Todas las categorías",
     });
-    await this.page.waitForLoadState("networkidle");
+    // RECOMENDACIÓN: Reemplazar 'networkidle'.
+    await this.waitForProductsToLoad();
   }
 
   // Filtra los productos por pais+
   async filterByCountry(country: string) {
     await this.countryFilter.selectOption({ label: country });
-    await this.page.waitForLoadState("networkidle");
+    // RECOMENDACIÓN: Reemplazar 'networkidle'.
+    await this.waitForProductsToLoad();
   }
 
   // Hace click en el boton de cargar mas productos
   async loadMoreProducts() {
     await this.loadMoreButton.click();
-    // Es una mejor práctica esperar a que el loader sea visible y luego esperar a que se oculte.
-    // Esto evita race conditions donde el loader aparece y desaparece muy rápido.
-    await expect(this.loader).toBeVisible();
-    await expect(this.loader).toBeHidden({ timeout: 10000 });
+    // CORRECCIÓN: La lógica de espera del loader estaba duplicada y era incorrecta.
+    // La forma correcta es esperar a que el loader desaparezca.
+    // Si la carga es muy rápida, el loader puede no aparecer, por lo que
+    // `waitFor({ state: "hidden" })` lo manejará correctamente.
+    await this.loader.waitFor({ state: "hidden", timeout: 15000 });
   }
 
   // Cuenta los productos visibles
   async getProductCount(): Promise<number> {
     return this.productListContainer.locator("a.card-link").count();
+  }
+
+  getProductCards(): Locator {
+    return this.productListContainer.locator("a.card-link");
   }
 
   //  Encuentra un producto por el nombre del producto
@@ -89,6 +105,18 @@ export class ProductsPage {
     });
   }
 
+  /**
+   * Método reutilizable para esperar a que la lista de productos se cargue.
+   * Espera a que el spinner/loader desaparezca. Es la forma más robusta
+   * de sincronizar los tests con las actualizaciones de la UI.
+   */
+  async waitForProductsToLoad() {
+    // Primero, esperamos a que el loader sea potencialmente visible.
+    // Usamos un timeout corto y un catch porque puede que no aparezca si la carga es instantánea.
+    await this.loader.waitFor({ state: "visible", timeout: 2000 }).catch(() => {});
+    // Luego, y más importante, esperamos a que desaparezca.
+    await this.loader.waitFor({ state: "hidden", timeout: 15000 });
+  }
   // Hace click en el boton de cookies
   async handleCookies() {
     // Este método es un placeholder. Si aparece un banner de cookies,

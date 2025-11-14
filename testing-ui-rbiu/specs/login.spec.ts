@@ -27,23 +27,28 @@ test.describe("Login de Usuarios  /login", () => {
   const invalidLoginData = [
     {
       case: "contraseña incorrecta",
-      email: config.EMAIL,
+      email: config.EMAIL!,
       password: "contraseñaIncorrecta",
+      expectedMessage: "Credenciales inválidas. Inténtalo de nuevo.",
     },
     {
       case: "usuario no registrado",
       email: "usuarioNoRegistrado@example.com",
       password: "password123",
+      expectedMessage: "El correo electrónico no existe.",
     },
-    { case: "campos vacíos", email: "", password: "" },
+    {
+      case: "campos vacíos",
+      email: "",
+      password: "",
+      expectedMessage: "Error de inicio de sesión.",
+    },
   ];
 
   for (const data of invalidLoginData) {
     test(`Login fallido con ${data.case}`, async () => {
       await loginPage.login(data.email, data.password);
-      await loginPage.verifyErrorMessage(
-        "Su intento de inicio de sesión no tuvo éxito. Inténtalo de nuevo."
-      );
+      await loginPage.verifyErrorMessage(data.expectedMessage);
     });
   }
 });

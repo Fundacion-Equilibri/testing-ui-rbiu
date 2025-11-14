@@ -4,14 +4,35 @@
  
  ## 1. Prerrequisitos
  
- Antes de poder ejecutar las pruebas, es necesario instalar todas las dependencias del proyecto. Esto solo se necesita hacer una vez, o cada vez que se añadan nuevas dependencias.
+Antes de poder ejecutar las pruebas, es necesario configurar el entorno y las dependencias.
  
- ```bash
- npm install
- ```
+### 1.1. Variables de Entorno (Credenciales)
  
- Este comando lee el archivo `package.json` y descarga las librerías necesarias, como Playwright, en la carpeta `node_modules`.
+El proyecto utiliza un archivo `.env` para gestionar credenciales y URLs de prueba.
  
+1.  Busca el archivo `example.env` en la raíz del proyecto.
+2.  Crea una copia de este archivo y renómbrala a `.env`.
+3.  Abre el nuevo archivo `.env` y rellena los valores con tus credenciales.
+ 
+> **Importante:** El archivo `.env` está excluido del control de versiones por seguridad.
+ 
+### 1.2. Instalar Dependencias y Navegadores
+ 
+ Una vez configuradas las variables de entorno, instala las dependencias y los navegadores necesarios para Playwright.
+ 
+ 1. **Instalar dependencias de Node.js:**
+    Este comando lee el `package.json` y descarga las librerías, como Playwright, en la carpeta `node_modules`.
+    ```bash
+    npm install
+    ```
+ 
+ 2. **Instalar los navegadores de Playwright:**
+    Playwright necesita descargar los navegadores que usará para las pruebas (Chromium, Firefox, WebKit).
+    ```bash
+    npx playwright install
+    ```
+ 
+ Este comando lee el archivo `package.json` y descarga las librerías necesarias, como Playwright, en la carpeta `node_modules`. 
  ## 2. Cómo Ejecutar las Pruebas
  
  El archivo `package.json` tiene scripts preconfigurados para facilitar la ejecución de las pruebas de Playwright.
@@ -20,7 +41,7 @@
  
  -   **Ejecutar todas las pruebas en modo headless (sin interfaz gráfica):**
      ```bash
-     npm test
+     npm run test
      ```
      Este es el comando ideal para entornos de integración continua (CI) o para una ejecución rápida.
  

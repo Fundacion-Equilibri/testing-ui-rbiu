@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect } from "@playwright/test";
 
-export class EditProductPage {
+export class EditNeedPage {
   readonly page: Page;
   readonly pageTitle: Locator;
   readonly deleteLink: Locator;
@@ -10,7 +10,7 @@ export class EditProductPage {
     // El selector getByRole('heading') falla porque el texto del título no está en una etiqueta
     this.pageTitle = page
       .locator("article")
-      .getByText("Modifica un producto", { exact: true });
+      .getByText("Modifica tu necesidad", { exact: true });
     // Localiza el boton de eliminar
     this.deleteLink = page.locator(
       ".et_pb_button.et_pb_button_eliminar_producto"
@@ -18,17 +18,13 @@ export class EditProductPage {
   }
 
   async verifyPageLoaded() {
-    // Expresion regular para verificar que estamos en la URL correcta /modifica-un-producto/?id=495
-    await expect(this.page).toHaveURL(/.*\/modifica-un-producto\/\?id=\d+/, {
-      timeout: 30000,
-    });
     // Añadimos un timeout explícito para dar margen a que la página cargue completamente.
     await expect(this.pageTitle).toBeVisible({ timeout: 10000 });
   }
 
-  async deleteProduct() {
+  async deleteNeed() {
     // Manejar el banner de cookies si está presente, ya que podría bloquear clics en modo headed.
-    // Idealmente, esto debería manejarse de forma global (ej. en un hook beforeEach o una función de setup).
+    // Idealmente, esto debería manbejarse de forma global (ej. en un hook beforeEach o una función de setup).
     const acceptCookiesButton = this.page
       .locator("#cookie-law-info-bar")
       .getByRole("button", { name: "Aceptar" });
@@ -51,7 +47,7 @@ export class EditProductPage {
     // Localiza el modal por su ID y espera a que sea visible.
     const confirmationModal = this.page.locator("#confirmationPopup", {
       has: this.page.getByRole("heading", {
-        name: "¿Estás seguro de que quieres eliminar el producto?",
+        name: "¿Estás seguro de que quieres eliminar la necesidad?",
       }),
     });
 

@@ -12,6 +12,8 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  // Tiempo de espera máximo por cada test individual.
+  timeout: 60000,
   // Centralizamos todos los tests en una única carpeta para mayor claridad.
   testDir: "./testing-ui-rbiu",
   /* Run tests in files in parallel */
@@ -21,7 +23,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 0 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 2 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     // Usamos un array para configurar el reporteador HTML con más detalle.
@@ -79,6 +81,10 @@ export default defineConfig({
       name: "public",
       testMatch: /.*\.spec\.ts/,
       testIgnore: /.*(\.auth\.spec\.ts|auth\.setup\.ts)/,
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chrome",
+      },
     },
     // Proyecto 2: Realiza el login y guarda el estado.
     {

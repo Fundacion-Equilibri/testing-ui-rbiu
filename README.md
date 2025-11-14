@@ -16,16 +16,23 @@ El proyecto utiliza un archivo `.env` para gestionar credenciales y URLs de prue
  
 > **Importante:** El archivo `.env` está excluido del control de versiones por seguridad.
  
-### 1.2. Instalar Dependencias
+### 1.2. Instalar Dependencias y Navegadores
  
-Una vez configuradas las variables de entorno, instala las dependencias del proyecto. Esto solo se necesita hacer una vez, o cada vez que se añadan nuevas librerías.
+ Una vez configuradas las variables de entorno, instala las dependencias y los navegadores necesarios para Playwright.
  
- ```bash
- npm install
- ```
+ 1. **Instalar dependencias de Node.js:**
+    Este comando lee el `package.json` y descarga las librerías, como Playwright, en la carpeta `node_modules`.
+    ```bash
+    npm install
+    ```
  
- Este comando lee el archivo `package.json` y descarga las librerías necesarias, como Playwright, en la carpeta `node_modules`.
+ 2. **Instalar los navegadores de Playwright:**
+    Playwright necesita descargar los navegadores que usará para las pruebas (Chromium, Firefox, WebKit).
+    ```bash
+    npx playwright install
+    ```
  
+ Este comando lee el archivo `package.json` y descarga las librerías necesarias, como Playwright, en la carpeta `node_modules`. 
  ## 2. Cómo Ejecutar las Pruebas
  
  El archivo `package.json` tiene scripts preconfigurados para facilitar la ejecución de las pruebas de Playwright.
@@ -34,7 +41,7 @@ Una vez configuradas las variables de entorno, instala las dependencias del proy
  
  -   **Ejecutar todas las pruebas en modo headless (sin interfaz gráfica):**
      ```bash
-     npm test
+     npm run test
      ```
      Este es el comando ideal para entornos de integración continua (CI) o para una ejecución rápida.
  

@@ -81,6 +81,10 @@ export default defineConfig({
       name: "public",
       testMatch: /.*\.spec\.ts/,
       testIgnore: /.*(\.auth\.spec\.ts|auth\.setup\.ts)/,
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chrome",
+      },
     },
     // Proyecto 2: Realiza el login y guarda el estado.
     {

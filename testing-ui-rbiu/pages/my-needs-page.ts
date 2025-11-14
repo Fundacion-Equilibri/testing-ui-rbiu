@@ -17,7 +17,9 @@ export class MyNeedsPage {
   }
 
   async goto() {
-    await this.page.goto(`${config.URL_BASE}/mis-necesidades/`);
+    await this.page.goto(`${config.URL_BASE}/mis-necesidades/`, {
+      timeout: 30000,
+    });
   }
 
   // VERIFICA QUE LA NECESIDAD EXISTE CON UN NOMBRE

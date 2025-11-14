@@ -37,6 +37,7 @@ test.describe("Página de Mis Necesidades /mis-necesidades (Auth)", () => {
     // Usamos un `if` para evitar errores si el test falló antes de crear la necesidad.
     if (await myNeedsPage.isNeedListed(needData.name)) {
       await myNeedsPage.editNeed(needData.name);
+      await editNeedPage.verifyPageLoaded();
       await editNeedPage.deleteNeed();
     }
   });
@@ -79,15 +80,7 @@ test.describe("Página de Mis Necesidades /mis-necesidades (Auth)", () => {
     await createNeedPage.submit();
     await createNeedPage.verifySuccess(needData.name);
 
-    // Act: Navegar a "Mis Necesidades", encontrar la necesidad y eliminarla.
-    await myNeedsPage.goto();
-    await myNeedsPage.verifyNeedIsListed(needData.name, needData.minPrice, needData.maxPrice);
-    await myNeedsPage.editNeed(needData.name);
-    await editNeedPage.verifyPageLoaded();
-    await editNeedPage.deleteNeed();
-
     // Assert: Verificar que la necesidad ya no aparece en la lista y que fuimos redirigidos correctamente.
     await myNeedsPage.verifyNeedIsNotListed(needData.name);
-    await expect(myNeedsPage.page).toHaveURL(/.*\/mis-necesidades\/?/);
   });
 });

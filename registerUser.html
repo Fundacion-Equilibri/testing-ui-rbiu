@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Registro - Validación Avanzada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/23.0.10/css/intlTelInput.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        :root {
+            --primary-color: #028093;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --border-color: #ddd;
+            --focus-color: #3498db;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1, h2 {
+            margin-bottom: 15px;
+        }
+        
+        .form-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--error-color);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--focus-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        input:invalid, select:invalid, textarea:invalid {
+            border-color: var(--error-color);
+        }
+        
+        input:valid, select:valid, textarea:valid {
+            border-color: var(--success-color);
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .field-with-error input, 
+        .field-with-error select, 
+        .field-with-error textarea {
+            border-color: var(--error-color);
+        }
+        
+        .field-with-error .error-message {
+            display: block;
+        }
+        
+        .char-counter {
+            font-size: 14px;
+            color: #777;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .password-strength {
+            height: 5px;
+            border-radius: 5px;
+            margin-top: 5px;
+            background-color: #eee;
+            overflow: hidden;
+        }
+        
+        .password-strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        
+        .password-weak .password-strength-fill {
+            width: 25%;
+            background-color: var(--error-color);
+        }
+        
+        .password-medium .password-strength-fill {
+            width: 50%;
+            background-color: #f39c12;
+        }
+        
+        .password-strong .password-strength-fill {
+            width: 75%;
+            background-color: #2ecc71;
+        }
+        
+        .password-very-strong .password-strength-fill {
+            width: 100%;
+            background-color: #27ae60;
+        }
+        
+        .phone-input-container {
+            position: relative;
+        }
+        
+        .phone-input-container .iti {
+            width: 100%;
+        }
+        
+        .flex-container {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .flex-item {
+            flex: 1;
+        }
+        
+        .map-container {
+            height: 300px;
+            margin-top: 10px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #026a7a;
+        }
+        
+        .btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .rules {
+            margin-left: 8px;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 13px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .flex-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Alta datos usuario v2 Unificado</h1>
+        </header>
+        
+        <form id="registrationForm" novalidate>
+            <!-- Datos personales -->
+            <section class="form-section">
+                <h2>Datos personales</h2>
+                <p>Completa tus datos personales. Todo lo que compartas aquí estará seguro y protegido.</p>
+                
+                <div class="flex-container">
+                    <div class="form-group flex-item">
+                        <label for="nombre" class="required">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" required maxlength="50" 
+                               pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                               title="Solo se permiten letras y espacios">
+                        <div class="error-message" id="nombre-error"></div>
+                        <div class="char-counter"><span id="nombre-counter">0</span> de 50 caracteres máximos</div>
+                    </div>
+                    
+                    <div class="form-group flex-item">
+                        <label for="apellidos" class="required">Apellidos</label>
+                        <input type="text" id="apellidos" name="apellidos" required maxlength="50"
+                               pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                               title="Solo se permiten letras y espacios">
+                        <div class="error-message" id="apellidos-error"></div>
+                        <div class="char-counter"><span id="apellidos-counter">0</span> de 50 caracteres máximos</div>
+                    </div>
+                </div>
+                
+                <div class="flex-container">
+                    <div class="form-group flex-item">
+                        <label for="nacionalidad" class="required">Nacionalidad</label>
+                        <select id="nacionalidad" name="nacionalidad" required>
+                            <option value="">Selecciona una nacionalidad</option>
+                            <option value="España">España</option>
+                            <option value="Argentina">Argentina</option>
+                            <option value="Bolivia" selected>Bolivia</option>
+                            <!-- Más opciones aquí -->
+                        </select>
+                        <div class="error-message" id="nacionalidad-error"></div>
+                    </div>
+                    
+                    <div class="form-group flex-item">
+                        <label for="pais-intercambio" class="required">País de intercambio</label>
+                        <input type="text" id="pais-intercambio" name="pais-intercambio" required value="Bolivia">
+                        <div class="error-message" id="pais-intercambio-error"></div>
+                    </div>
+                </div>
+                
+                <div class="flex-container">
+                    <div class="form-group flex-item">
+                        <label for="telefono" class="required">Teléfono móvil</label>
+                        <div class="phone-input-container">
+                            <input type="tel" id="telefono" name="telefono" required>
+                        </div>
+                        <div class="error-message" id="telefono-error"></div>
+                    </div>
+                    
+                    <div class="form-group flex-item">
+                        <label for="fecha-nacimiento" class="required">Fecha de nacimiento</label>
+                        <input type="date" id="fecha-nacimiento" name="fecha-nacimiento" required
+                               min="1920-01-01" max="2010-12-31">
+                        <div class="error-message" id="fecha-nacimiento-error"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Datos públicos -->
+            <section class="form-section">
+                <h2>Datos públicos</h2>
+                <p>Rellena los campos con la información que será compartida con otros usuarios.</p>
+                
+                <div class="form-group">
+                    <label for="nombre-publico" class="required">Nombre público</label>
+                    <input type="text" id="nombre-publico" name="nombre-publico" required maxlength="50">
+                    <div class="error-message" id="nombre-publico-error"></div>
+                    <div class="char-counter"><span id="nombre-publico-counter">0</span> de 50 caracteres máximos</div>
+                    <small>Este será el nombre por el que te conocerán el resto de usuarios.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="presentacion">Mi presentación</label>
+                    <textarea id="presentacion" name="presentacion" maxlength="150" rows="4"></textarea>
+                    <div class="error-message" id="presentacion-error"></div>
+                    <div class="char-counter"><span id="presentacion-counter">0</span> de 150 caracteres máximos</div>
+                    <small>Cuéntanos un poco sobre ti. Puedes incluir información de contacto para que otros usuarios puedan llegar a ti.</small>
+                </div>
+                
+                <div class="flex-container">
+                    <div class="form-group flex-item">
+                        <label for="ubicacion" class="required">Ubicación</label>
+                        <input type="text" id="ubicacion" name="ubicacion" required maxlength="40">
+                        <div class="error-message" id="ubicacion-error"></div>
+                        <div class="char-counter"><span id="ubicacion-counter">0</span> de 40 caracteres máximos</div>
+                    </div>
+                    
+                    <div class="form-group flex-item">
+                        <label for="direccion" class="required">Dirección</label>
+                        <input type="text" id="direccion" name="direccion" required maxlength="100">
+                        <div class="error-message" id="direccion-error"></div>
+                        <div class="char-counter"><span id="direccion-counter">0</span> de 100 caracteres máximos</div>
+                        <small>Dirección pública para realizar encuentros e intercambios.</small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="map">Selecciona tu ubicación en el mapa</label>
+                    <div id="map" class="map-container"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imagen-perfil">Imagen de perfil</label>
+                    <input type="file" id="imagen-perfil" name="imagen-perfil" 
+                           accept=".jpg,.jpeg,.png" 
+                           data-max-size="10485760">
+                    <div class="error-message" id="imagen-perfil-error"></div>
+                    <small>Tipos de archivos aceptados: jpg, jpeg, png. Tamaño máximo de archivo: 10 MB.</small>
+                </div>
+            </section>
+            
+            <!-- Datos de acceso -->
+            <section class="form-section">
+                <h2>Datos de acceso</h2>
+                <p>Introduce los datos con los que ingresarás a la plataforma.</p>
+                
+                <div class="rules">
+                    <strong>Requisitos de la contraseña:</strong><br>
+                    - Mínimo 8 caracteres<br>
+                    - Al menos 1 número (0-9)<br>
+                    - Al menos 1 letra mayúscula (A-Z) y 1 minúscula (a-z)<br>
+                    - Opcional: Símbolos (como: !@#$%^&*) para mayor seguridad
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="required">Correo electrónico</label>
+                    <input type="email" id="email" name="email" required maxlength="100"
+                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                    <div class="error-message" id="email-error"></div>
+                    <div class="char-counter"><span id="email-counter">0</span> de 100 caracteres máximos</div>
+                    <small>Te enviaremos un mensaje para verificar tu correo. Asegúrate de que tu bandeja no esté llena y puedas recibir correos para completar tu registro.</small>
+                </div>
+                
+                <div class="flex-container">
+                    <div class="form-group flex-item">
+                        <label for="password" class="required">Contraseña</label>
+                        <input type="password" id="password" name="password" required
+                               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,}$">
+                        <div class="error-message" id="password-error"></div>
+                        <div class="password-strength">
+                            <div class="password-strength-fill"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group flex-item">
+                        <label for="confirm-password" class="required">Confirmar contraseña</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                        <div class="error-message" id="confirm-password-error"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="form-section">
+                <button type="submit" class="btn" id="submit-btn">Regístrate</button>
+            </section>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/23.0.10/js/intlTelInput.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicialización y configuración
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar el plugin de teléfono internacional
+            const phoneInput = document.querySelector("#telefono");
+            const iti = window.intlTelInput(phoneInput, {
+                initialCountry: "bo",
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/23.0.10/js/utils.js"
+            });
+            
+            // Inicializar el mapa
+            const map = L.map('map').setView([-16.5000, -68.1500], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            const marker = L.marker([-16.5000, -68.1500]).addTo(map);
+            
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                // Aquí podrías invertir la geocodificación para obtener la dirección
+            });
+            
+            // Configurar contadores de caracteres
+            setupCharacterCounters();
+            
+            // Configurar validación de formulario
+            setupFormValidation();
+            
+            // Configurar visualización de fuerza de contraseña
+            setupPasswordStrength();
+        });
+        
+        function setupCharacterCounters() {
+            const counters = [
+                { id: 'nombre', max: 50 },
+                { id: 'apellidos', max: 50 },
+                { id: 'nombre-publico', max: 50 },
+                { id: 'presentacion', max: 150 },
+                { id: 'ubicacion', max: 40 },
+                { id: 'direccion', max: 100 },
+                { id: 'email', max: 100 }
+            ];
+            
+            counters.forEach(counter => {
+                const input = document.getElementById(counter.id);
+                const counterElement = document.getElementById(`${counter.id}-counter`);
+                
+                input.addEventListener('input', function() {
+                    counterElement.textContent = this.value.length;
+                });
+            });
+        }
+        
+        function setupFormValidation() {
+            const form = document.getElementById('registrationForm');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            // Validación en tiempo real
+            form.addEventListener('input', function(e) {
+                validateField(e.target);
+                updateSubmitButton();
+            });
+            
+            // Validación al enviar el formulario
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    // Aquí enviarías el formulario
+                    alert('Formulario válido. Enviando datos...');
+                    // form.submit(); // Descomenta para enviar realmente
+                } else {
+                    alert('Por favor, corrige los errores en el formulario.');
+                }
+            });
+            
+            // Validación personalizada para campos específicos
+            setupCustomValidations();
+        }
+        
+        function setupCustomValidations() {
+            // Validación de teléfono internacional
+            const phoneInput = document.getElementById('telefono');
+            phoneInput.addEventListener('input', function() {
+                const iti = window.intlTelInputGlobals.getInstance(phoneInput);
+                const isValid = iti.isValidNumber();
+                
+                if (!isValid && phoneInput.value) {
+                    showError(phoneInput, 'Número de teléfono inválido');
+                } else {
+                    clearError(phoneInput);
+                }
+            });
+            
+            // Validación de confirmación de contraseña
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            
+            confirmPasswordInput.addEventListener('input', function() {
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    showError(confirmPasswordInput, 'Las contraseñas no coinciden');
+                } else {
+                    clearError(confirmPasswordInput);
+                }
+            });
+            
+            // Validación de archivo
+            const fileInput = document.getElementById('imagen-perfil');
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    const maxSize = parseInt(this.getAttribute('data-max-size'));
+                    
+                    // Validar tipo de archivo
+                    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                    if (!validTypes.includes(file.type)) {
+                        showError(this, 'Tipo de archivo no válido. Solo se permiten JPG, JPEG y PNG.');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    // Validar tamaño de archivo
+                    if (file.size > maxSize) {
+                        showError(this, `El archivo es demasiado grande. Tamaño máximo: ${maxSize/1024/1024}MB`);
+                        this.value = '';
+                        return;
+                    }
+                    
+                    clearError(this);
+                }
+            });
+        }
+        
+        function setupPasswordStrength() {
+            const passwordInput = document.getElementById('password');
+            const strengthMeter = document.querySelector('.password-strength-fill');
+            const strengthContainer = document.querySelector('.password-strength').parentElement;
+            
+            passwordInput.addEventListener('input', function() {
+                const strength = calculatePasswordStrength(this.value);
+                
+                // Reset classes
+                strengthContainer.classList.remove('password-weak', 'password-medium', 'password-strong', 'password-very-strong');
+                
+                // Apply appropriate class
+                if (strength.score > 80) {
+                    strengthContainer.classList.add('password-very-strong');
+                } else if (strength.score > 60) {
+                    strengthContainer.classList.add('password-strong');
+                } else if (strength.score > 40) {
+                    strengthContainer.classList.add('password-medium');
+                } else if (strength.score > 0) {
+                    strengthContainer.classList.add('password-weak');
+                }
+                
+                // Update visual indicator
+                strengthMeter.style.width = `${strength.score}%`;
+            });
+        }
+        
+        function calculatePasswordStrength(password) {
+            let score = 0;
+            
+            if (!password) return { score: 0, feedback: [] };
+            
+            // Length
+            if (password.length >= 8) score += 25;
+            if (password.length >= 12) score += 10;
+            
+            // Character variety
+            if (/[a-z]/.test(password)) score += 10;
+            if (/[A-Z]/.test(password)) score += 15;
+            if (/[0-9]/.test(password)) score += 15;
+            if (/[^a-zA-Z0-9]/.test(password)) score += 20;
+            
+            // Penalties for common patterns
+            if (/(.)\1{2,}/.test(password)) score -= 10; // Repeated characters
+            if (/123|abc|password/i.test(password)) score -= 15; // Common sequences
+            
+            // Ensure score is between 0 and 100
+            score = Math.max(0, Math.min(100, score));
+            
+            return { score };
+        }
+        
+        function validateField(field) {
+            // Limpiar error previo
+            clearError(field);
+            
+            // Validar campo requerido
+            if (field.hasAttribute('required') && !field.value.trim()) {
+                showError(field, 'Este campo es obligatorio');
+                return false;
+            }
+            
+            // Validar patrón si existe
+            if (field.hasAttribute('pattern') && field.value) {
+                const pattern = new RegExp(field.getAttribute('pattern'));
+                if (!pattern.test(field.value)) {
+                    const title = field.getAttribute('title') || 'Formato inválido';
+                    showError(field, title);
+                    return false;
+                }
+            }
+            
+            // Validaciones específicas por tipo
+            switch(field.type) {
+                case 'email':
+                    if (field.value && !isValidEmail(field.value)) {
+                        showError(field, 'Por favor, introduce un email válido');
+                        return false;
+                    }
+                    break;
+                    
+                case 'tel':
+                    // La validación del teléfono se maneja en las validaciones personalizadas
+                    break;
+                    
+                case 'date':
+                    if (field.value) {
+                        const selectedDate = new Date(field.value);
+                        const minDate = field.min ? new Date(field.min) : new Date('1920-01-01');
+                        const maxDate = field.max ? new Date(field.max) : new Date('2010-12-31');
+                        
+                        if (selectedDate < minDate || selectedDate > maxDate) {
+                            showError(field, `La fecha debe estar entre ${minDate.toLocaleDateString()} y ${maxDate.toLocaleDateString()}`);
+                            return false;
+                        }
+                    }
+                    break;
+            }
+            
+            return true;
+        }
+        
+        function validateForm() {
+            const form = document.getElementById('registrationForm');
+            const fields = form.querySelectorAll('input, select, textarea');
+            let isValid = true;
+            
+            fields.forEach(field => {
+                if (!validateField(field)) {
+                    isValid = false;
+                }
+            });
+            
+            // Validación adicional para confirmación de contraseña
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm-password');
+            
+            if (password.value !== confirmPassword.value) {
+                showError(confirmPassword, 'Las contraseñas no coinciden');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        function showError(field, message) {
+            field.classList.add('field-with-error');
+            const errorElement = document.getElementById(`${field.id}-error`);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+        
+        function clearError(field) {
+            field.classList.remove('field-with-error');
+            const errorElement = document.getElementById(`${field.id}-error`);
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+        
+        function updateSubmitButton() {
+            const form = document.getElementById('registrationForm');
+            const submitBtn = document.getElementById('submit-btn');
+            const fields = form.querySelectorAll('input[required], select[required], textarea[required]');
+            
+            let allRequiredFilled = true;
+            
+            fields.forEach(field => {
+                if (!field.value.trim()) {
+                    allRequiredFilled = false;
+                }
+            });
+            
+            submitBtn.disabled = !allRequiredFilled;
+        }
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    </script>
+</body>
+</html>

@@ -25,7 +25,11 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
         reservable: "No",
         deliveryDetails:
           "Las entregas se realizan desde las 08:00 hasta las 15:00 de lunes a viernes",
-        expirationDate: { day: "1", month: "12", year: "2025" },
+        expirationDate: {
+          day: `${new Date().getDate()}`,
+          month: `${new Date().getMonth()}`,
+          year: `${new Date().getFullYear() + 1}`,
+        },
       };
     });
 
@@ -85,7 +89,11 @@ test.describe("Página de crear un producto /crea-un-producto (Auth)", () => {
       visible: "Sí",
       reservable: "No",
       deliveryDetails: "Detalles de entrega.",
-      expirationDate: { day: "1", month: "12", year: "2025" },
+      expirationDate: {
+        day: "1",
+        month: "12",
+        year: `${new Date().getFullYear() + 1}`,
+      },
     };
 
     const validationTestCases = [

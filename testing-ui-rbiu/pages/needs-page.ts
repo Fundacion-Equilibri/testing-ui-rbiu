@@ -100,16 +100,16 @@ export class NeedsPage {
 
   // Cuenta los productos visibles
   async getProductCount(): Promise<number> {
-    return this.productListContainer.locator("a.card-link").count();
+    return this.productListContainer.locator("div.card-link").count();
   }
 
   getProductCards(): Locator {
-    return this.productListContainer.locator("a.card-link");
+    return this.productListContainer.locator("div.card-link");
   }
 
   //  Encuentra una necesidad por el nombre de la necesidad
   getNeedCard(needName: string): Locator {
-    return this.productListContainer.locator("a.card-link", {
+    return this.productListContainer.locator("div.card-link", {
       hasText: needName ,
     });
   }

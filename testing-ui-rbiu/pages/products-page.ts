@@ -91,16 +91,16 @@ export class ProductsPage {
 
   // Cuenta los productos visibles
   async getProductCount(): Promise<number> {
-    return this.productListContainer.locator("a.card-link").count();
+    return this.productListContainer.locator("div.card-link").count();
   }
 
   getProductCards(): Locator {
-    return this.productListContainer.locator("a.card-link");
+    return this.productListContainer.locator("div.card-link");
   }
 
   //  Encuentra un producto por el nombre del producto
   getProductCard(productName: string): Locator {
-    return this.productListContainer.locator("a.card-link", {
+    return this.productListContainer.locator("div.card-link", {
       hasText: productName,
     });
   }

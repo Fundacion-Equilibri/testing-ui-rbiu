@@ -45,7 +45,11 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
         visible: "Sí",
         reservable: "No",
         deliveryDetails: "Entrega inmediata.",
-        expirationDate: { day: "1", month: "1", year: "2026" },
+        expirationDate: {
+          day: "1",
+          month: "1",
+          year: `${new Date().getFullYear() + 1}`,
+        },
       };
 
       // Setup: Crear el producto antes del test
@@ -103,7 +107,7 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
         visible: "Sí",
         reservable: "No",
         deliveryDetails: "Entrega.",
-        expirationDate: { day: "1", month: "1", year: "2026" },
+        expirationDate: { day: "1", month: "1", year: `${new Date().getFullYear() + 1}` },
         category: "Telefonía móvil",
       };
       productsToClean.push(productTelefonía.name);
@@ -135,7 +139,7 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
         reservable: "No",
         deliveryDetails:
           "Entrega. desde las 14:00 hasta las 18:00 Merecado Bejin",
-        expirationDate: { day: "1", month: "1", year: "2026" },
+        expirationDate: { day: "1", month: "1", year: `${new Date().getFullYear() + 1}` },
       };
       productsToClean.push(productBolivia.name);
 
@@ -149,7 +153,7 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
       await productsPage.filterByCountry("Bolivia");
       await productsPage.searchProduct(productBolivia.name);
       await productsPage.verifyProductIsVisible(productBolivia.name);
- 
+
       await productsPage.filterByCountry("España");
       // Después de filtrar por España, el producto de Bolivia ya no debería ser visible.
       await productsPage.verifyProductIsNotVisible(productBolivia.name);
@@ -172,7 +176,7 @@ test.describe("Página de Mercado /mercado (Auth)", () => {
         visible: "Sí",
         reservable: "No",
         deliveryDetails: "Entrega.",
-        expirationDate: { day: "1", month: "1", year: "2026" },
+        expirationDate: { day: "1", month: "1", year: `${new Date().getFullYear() + 1}` },
       };
       // Se necesita una instancia de página para crear el producto.
       // Usaremos un browser context temporal para esto.

@@ -34,7 +34,11 @@ test.describe("Pagina de Mis Productos /mis-productos (Auth)", () => {
       reservable: "No",
       category: "Transportes y desplazamientos",
       deliveryDetails: "Entrega en mano en la zona centro.",
-      expirationDate: { day: "15", month: "11", year: "2025" },
+      expirationDate: {
+        day: "15",
+        month: "11",
+        year: `${new Date().getFullYear() + 1}`,
+      },
     };
   });
 
@@ -60,7 +64,10 @@ test.describe("Pagina de Mis Productos /mis-productos (Auth)", () => {
 
     // Paso 2: Ir a la pagina de edicion y eliminar producto
     await myProductsPage.goto();
-    await myProductsPage.verifyProductIsListed(productData.name, productData.price)
+    await myProductsPage.verifyProductIsListed(
+      productData.name,
+      productData.price
+    );
     await myProductsPage.editProduct(productData.name); // Verifica que existe el producto creado
 
     // Paso 3: Verificar que estamos en la página de edición y eliminar el producto.

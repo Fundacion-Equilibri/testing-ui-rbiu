@@ -2,13 +2,17 @@ name: Playwright Tests
 
 on:
   push:
-    branches: ["main"] # o la rama donde quieras ejecutar
+    branches: ["main", "develop"] # o la rama donde quieras ejecutar
   pull_request:
-    branches: ["main"]
+    branches: ["main", "develop"]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     env:
       # Reemplaza la siguiente URL con la de tu aplicación desplegada
       BASE_URL: https://mi-app.com
@@ -38,3 +42,13 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 20
+
+      - name: Subir informe para GitHub Pages
+        if: always()
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: playwright-report
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: actions/deploy-pages@v1

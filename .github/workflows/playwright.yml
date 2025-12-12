@@ -15,7 +15,13 @@ jobs:
       id-token: write
     env:
       # Reemplaza la siguiente URL con la de tu aplicación desplegada
-      BASE_URL: https://mi-app.com
+      BASE_URL: ${{ secrets.BASE_URL }}
+      EUTAXIA_EMAIL: ${{ secrets.EUTAXIA_EMAIL }}
+      EUTAXIA_PASSWORD: ${{ secrets.EUTAXIA_PASSWORD }}
+      SECOND_EUTAXIA_EMAIL: ${{ secrets.SECOND_EUTAXIA_EMAIL }}
+      SECOND_EUTAXIA_PASSWORD: ${{ secrets.SECOND_EUTAXIA_PASSWORD }}
+      PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
+      CI: 2
 
     steps:
       - name: Checkout código
@@ -43,12 +49,14 @@ jobs:
           path: playwright-report/
           retention-days: 20
 
+      # AÑADIDO: Subir el reporte para GitHub Pages
       - name: Subir informe para GitHub Pages
         if: always()
         uses: actions/upload-pages-artifact@v1
         with:
           path: playwright-report
 
+      # AÑADIDO: Desplegar el reporte en GitHub Pages
       - name: Deploy to GitHub Pages
         if: always()
         uses: actions/deploy-pages@v1

@@ -2,17 +2,15 @@ name: Playwright Tests
 
 on:
   push:
-    branches: ["main", "develop"] # o la rama donde quieras ejecutar
+    branches: ["develop"]
   pull_request:
-    branches: ["main", "develop"]
+    branches: ["develop"]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: write
-      id-token: write
     env:
       # Reemplaza la siguiente URL con la de tu aplicación desplegada
       BASE_URL: ${{ secrets.BASE_URL }}
@@ -49,14 +47,12 @@ jobs:
           path: playwright-report/
           retention-days: 20
 
-      # AÑADIDO: Subir el reporte para GitHub Pages
-      - name: Subir informe para GitHub Pages
+      - name: Deploy report to Netlify
         if: always()
-        uses: actions/upload-pages-artifact@v3
+        uses: netlify/actions/cli@master
         with:
-          path: playwright-report
+          args: deploy --prod --dir=playwright-report
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
-      # AÑADIDO: Desplegar el reporte en GitHub Pages
-      - name: Deploy to GitHub Pages
-        if: always()
-        uses: actions/deploy-pages@v3

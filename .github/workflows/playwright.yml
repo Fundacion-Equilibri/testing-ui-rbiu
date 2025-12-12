@@ -52,11 +52,11 @@ jobs:
       # AÑADIDO: Subir el reporte para GitHub Pages
       - name: Subir informe para GitHub Pages
         if: always()
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: playwright-report
 
       # AÑADIDO: Desplegar el reporte en GitHub Pages
       - name: Deploy to GitHub Pages
         if: always()
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v3
